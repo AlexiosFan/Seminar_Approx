@@ -9,3 +9,10 @@ The planned list of algorithms to be included in this work is (but not limited t
 - Traveling Salesman
 - Maximizing float in bank accounts
 - Edge Coloring
+
+## Structure of Presentation(subject to change)
+1. Intro to Approximation, to be absorbed if the other candidate comes in the first place
+2. Discriminination of local/greedy search
+3. Actual contents
+4. Conclusion with some overview of related courses?
+
