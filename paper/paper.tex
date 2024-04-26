@@ -1,0 +1,231 @@
+\documentclass[11pt,psfig,times]{article}
+\voffset=-2.2cm
+\hoffset=-2.1cm
+
+\setlength{\textwidth}{16.8cm}
+\setlength{\textheight}{22.8cm}
+
+\usepackage[dvips]{graphics,color}
+\usepackage{latexsym}
+\usepackage{epsfig}
+\usepackage{times}
+\usepackage{amssymb}
+\usepackage{enumerate}
+\usepackage{bm}
+\usepackage{enumitem}
+\usepackage{tikz}
+
+
+\usepackage{amsfonts}
+\usepackage{amsthm, amsmath,amsfonts, amssymb}
+\usepackage{cleveref}
+
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+\renewcommand{\baselinestretch}{1.1}
+
+\newcommand{\ignore}[1]{{}}
+
+\newcommand*{\PTIME}{\textbf{P}}
+\newcommand*{\NP}{\textbf{NP}}
+\newcommand*{\bigo}[1]{\mathcal{O}(#1)}
+
+ 
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{claim}{Claim}
+\newtheorem{proposition}{Proposition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{fact}{Fact}
+
+\begin{document}
+
+\title{Approximation Algorithms: Greedy Algorithm and Local Search}
+\author{Zixuan Fan\thanks{Department of Computer Science, Technical University of Munich. {\tt ge43yeb@mytum.de}}}
+\maketitle
+
+\section{Introduction}
+The theory of computer science has grown significant throughout the past century. Among many topics, \NP-hardness has drawn the attention of many researchers. 
+While there is no proof whether $\PTIME=\NP$, people tend to be interested in compensation: solving NP-hard problems with a sub-optimal solution in polynomial time.
+This is the motivation of approximation algorithms. This paper introduces two fundamental techniques in designing approximation algorithms: greedy algorithm and local search.
+We start with some mathematical backgrounds, followed by a brief introduction of greedy and local search. 
+Then, we present a few examples that exploit these techniques.
+
+\section{Mathematical Backgrounds}
+\subsection{Approximation Ratio}
+Approximation algorithms attempt to solve optimization problems with a sub-optimal solution in polynomial time. 
+Hence, in this context, we refer to an \NP-hard problem as an \NP-hard optimization problem instead of a decision problem. 
+With the goal problems clarified, we introduce the concept of approximation ratio.
+\begin{definition}[Approximation Ratio]
+    Given an optimization problem, its optimal solution $Opt^*$, and a sub-optimal solution $Opt$ given by algorithm $A$, suppose the size of solutions 
+    are measured by $|\cdot|$. The approximation ratio $\alpha$ of algorithm $A$ is defined as 
+    \begin{align*}
+        \alpha = \frac{|Opt|}{|Opt^*|}
+    \end{align*}
+\end{definition}
+The approximation ratio $\alpha$ shows how close the solution $Opt$ is to the optimal solution $Opt^*$. For an maximization problem, $\alpha < 1$, while $\alpha > 1$
+for a minimization problem. The better the approximation, the closer $\alpha$ is to 1.
+
+\subsection{Greedy Algorithms and Local Search}
+Both greedy algorithms and local search contructs the solution step by step. 
+In each step, the strategy makes certain desicions such that the result is locally optimal. 
+The difference between two techniques lies in the strategy of making decisions. 
+The greedy algorithms try to make the best decision at each step, the solution is not guaranted to 
+be \textit{feasible} at the beginning. On the other hand, local search starts with an arbitrary feasible solution,
+and maintains the feasibility while improving the solution. 
+Hence greedy algorithms are called \textit{primal infeasible} algorithms, while local search algorithms 
+are referred to as \textit{primal feasible} algorithms.
+
+
+\section{Scheduling on Single Machine}
+Scheduling or Job Sequencing, is one of the earliest discovered NP-complete problems. 
+It was amongst the first 21 NP-complete problems published by Karp in 1972. In this section, 
+we examine a simplified version of the problem: only one machine is available for scheduling.
+\begin{definition}[Scheduling on Single Machine]
+    Given $n$ jobs to be processed with processing time $p_j$, release time $r_j \geq 0$, and deadline $d_j$ with $j = 1, \cdots, n$.
+    Suppose $j$-th job is completed at time $C_j$, we define the lateness as $L_j = C_j - d_j$. The goal is minimizing the maximal lateness 
+    \begin{align*}
+        L_{max} = \max_{j = 1, \cdots, n} L_j
+    \end{align*}
+\end{definition} 
+Unfortunately, the problem is \NP-hard, and it remains \NP-hard even if we apply 
+a few constraints to it. \textbf{cite the source} One exceptional case is when all deadlines are non-negative: the lateness is always positive. 
+We are able to give a 2-approximation algorithm for this case. The algorithm simply exploits the earliest due date rule(\textbf{EDD}). 
+Just as the name suggests, whenever the machine finishes a job, it picks the job with the earliest due date from all \textbf{available} jobs.
+Here, a job is \textit{available} at time $t$ if $r_j \leq t$.
+
+To analyze the algorithm, we have to introduce a few notations. Let $S$ denote a set of jobs, $r(S) = \min_{j \in S} r_j$, $p(S) = \sum_{j \in S} p_j$, 
+and $d(S) = \max_{j \in S} d_j$. While $L_{max}$ denotes the maximal lateness computed by the algorithm, $L_{max}^*$ denotes the optimal solution. 
+As preparation, an interesting lowerbound on the optimal solution is observed. 
+\begin{lemma}
+    \label{lemma:lowerbound}
+    For any set of jobs $S$, $L_{max}^* \geq r(S) + p(S) - d(S)$
+\end{lemma}
+\begin{proof}
+    Suppose job $j$ is the last finished job in the optimal schedule. The scheduling cannot start until $r(S)$. In an optimal schedule, there is no gap between the processing of jobs, all jobs 
+    are processed consecutively in $p(S)$. Hence $j$ cannot be finished until $r(S) + p(S)$. In addition, we have $d_j \leq d(S)$ by definition. It follows 
+    \begin{align*}
+        L_{max}^* \geq L_j = C_j - d_j \geq r(S) + p(S) - d_j \geq r(S) + p(S) - d(S)
+    \end{align*} 
+\end{proof}
+We then take a closer look at the \textbf{EDD} rule. Suppose the release time $r_j$, processing time $p_j$, and the deadline $d_j$ are encoded as a ternary tuple $(r_j, p_j, d_j)$.
+The only part the requires heavy computation for \textbf{EDD} rule is choosing the job with the earliest due date.
+The easiest implementation is preserve a linked list to store the information of each job, which takes $\bigo{n^2}$ time in total. 
+A more efficient implementation takes advantage of a FIFO queue, which takes only $\bigo{n}$ time. In either cases, 
+the algorithm runs in polynomial time. This directly leads to the following theorem.
+\begin{theorem}
+    The EDD-rule algorithm runs in polynomial time. 
+\end{theorem}
+What we care more in the context of approximation algorithms is the approximation ratio. We then show that the algorithm yields the promised approximation ratio.
+\begin{theorem}
+    The EDD-rule algorithm yields a 2-approximation ratio.
+\end{theorem}
+\begin{proof}
+    Suppose $j$ is the job with the maximal lateness in the schedule generated by the \textbf{EDD} rule.
+    Let $t$ be the earliest time such that the machine keeps processing jobs continuously in the interval $[t, C_j]$.
+    Let $S$ be the set of jobs that are processed in this interval. In our assumption, $r(S) = t$ is guaranteed. 
+    Suppose for contradiction that $r(S) > t$, the processing would not be able to start at time $t$. 
+    Similarly, if $r(S) < t$, the processing would start earlier than $t$. Both cases contradict the assumption.
+    Furthermore, $p(S) = C_j - t$, for the processing is continuous and it stops at time $C_j$. Applying lemma \cref{lemma:lowerbound},
+    we obtain 
+    \begin{align*}
+        L_{max}^* \geq r(S) + p(S) - d(S) = t + C_j - t - d(S) = C_j - d(S) \geq C_j
+    \end{align*}
+    Additionally, it holds $d_j < d(S)$ by definition. Applying the same lemma, we have
+    \begin{align*}
+        L_{max}^* \geq r(S) + p(S) - d(S) \geq -d(S) \geq -d_j
+    \end{align*}
+    Observe that $L_{max} = C_j - d_j$. Hence in this schedule, it holds 
+    \begin{align*}
+        L_{max} = C_j - d_j \leq 2L_{max}^*
+    \end{align*}
+    which justifies the 2-approximation ratio.
+\end{proof}
+
+\section{Scheduling on Identical Parallel Machines}
+Just as we can run $k$-bands of Turing machines in parallel, jobs can be processed simultaneously on 
+$k$ machines, if available. The problem setting is then a bit different: there is no release date of jobs, and 
+the optimization goal is to minimize the time all jobs are finished. 
+\begin{definition}[Job Scheduling on Identical Parallel Machines]
+    Given $n$ jobs to be processed on $k$ identical parallel machines, each job $j$ has a processing time $p_j$ with $j = 1, \cdots, n$.
+    Suppose job $j$ is finished at time $C_j$, the minimization goal, the makespan, is defined as
+    \begin{align*}
+        C_{max} = \max_{j = 1, \cdots, n} C_j
+    \end{align*}
+\end{definition}
+For this problem, we present a local search algorithm and a greedy algorithm. The ideas of both algorithms 
+are both simple, while the analysis requires some effort. 
+
+\subsection{Local Search Algorithm}
+The local search algorithm starts with an arbitrary schedule. In each step, we try to find a better schedule for the last job to be completed. 
+More specifically, we traverse all machines, and try to move the job to another machine such that it finishes earlier. 
+Whenever no such move is possible, the algorithm terminates. To simply the analysis, we assume that there is no idle time on any machine in the initial schedule.  
+Again, we start with a lowerbound on the size of the optimal solution. 
+\begin{lemma}
+    \label{lemma:lowerbound2}
+    For a scheduling problem with $n$ jobs and $k$ identical machines, its optimal makespan is less equal than the average processing time of all jobs.
+    \begin{align*}
+        C_{max}^* \geq \frac{1}{k} \sum_{j=1, \cdots, n} p_j
+    \end{align*} 
+\end{lemma}
+\begin{proof}
+    We perform a case distinction
+    \begin{itemize}
+        \item All machines terminate at the same time. In this case, each machine runs exactly the average processing time, i.e. the equality holds in the lemma. 
+        \item At least two machines do not finish at the same time. In this case, the machine that finishes later runs more than the average processing time. Furthermore, the optimal solution has to run no shorter than this machine. 
+        Hence the strict inequality holds in the lemma.
+    \end{itemize}
+\end{proof}
+Using the same idea, we observe that the starting time of the last job satisfies an upperbound. 
+\begin{observation}
+    \label{observation:upperbound}
+    Let $j$ be the last job completed in the local search algorithm. We denote its starting time as $S_j = C_j - p_j$. It holds 
+    \begin{align*}
+        S_j \leq \frac{1}{k} \sum_{j=1, \cdots, n} p_j
+    \end{align*}
+\end{observation}
+\begin{proof}
+    If the last job is completed just as the average processing time, its starting time has to be strictly less than the average processing time. 
+    Otherwise, we suppose for contradiction that $S_j > \frac{1}{k} \sum_{j=1, \cdots, n} p_j$. By the strategy of the local search algorithm,
+    all other machines are still running at time $S_j$, otherwise the job can be moved to another machine. Hence all machines terminate 
+    later than $S_j$, implying that all machines terminate later than the average processing time. Since not all machines can terminate later than 
+    the average processing time, this is a contradiction. 
+\end{proof}
+Combining the two observations, we obtain $C_{max}^* > S_j$. Observe that $p_j \leq C_j$ by definition. 
+Hence we obtain the approximation ratio for this local search algorithm.
+\begin{theorem}
+    The local search algorithm yields a $2$-approximation ratio.
+\end{theorem}
+\begin{proof}
+    Let $j$ be the last job completed. We have
+    \begin{align*}
+        C_{max} = C_j = S_j + p_j \leq C_{maxc}^* + p_j \leq 2C_{max}^*
+    \end{align*}
+\end{proof}
+Finally, it suffices to show that the local search algorithm runs in polynomial time. If we manage 
+to show that a job is never moved twice, we can conclude that at most $n$ jobs will be moved. 
+
+
+
+\subsection{Greedy Algorithm}
+The greedy algorithm is similar to the \textbf{EDD} rule in the previous section. Whenever a machine is available, 
+we assign it a job from the job list. Since there is no release date, the choice is arbitrary. 
+This is referred to as \textbf{list scheduling} algorithm.  
+
+
+
+\begin{thebibliography}{10}
+\setlength{\itemsep}{0pt plus .3pt}
+\setlength{\parsep}{0pt plus .3pt}
+\setlength{\parskip}{0pt plus .3pt}
+
+\bibitem{AMO}
+R.J.\ Ahuja, T.L.\ Magnanti and J.B. Orlin. {\em Network Flows.\/} Prentice Hall, 1993.
+
+\end{thebibliography}
+
+\end{document} 

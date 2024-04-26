@@ -16,3 +16,9 @@ The planned list of algorithms to be included in this work is (but not limited t
 3. Actual contents
 4. Conclusion with some overview of related courses?
 
+## Questions to ask
+1. Is an abstract necessary for an rewriting of a textbook instead of a paper?
+2. Are pseudocodes necessary given that the ideas of approximation are usually fairly simple?
+3. There is probably no space for everything inside the paper: difference in contents between presentation and paper?
+4. grading scheme: which one is more important, the paper or the presentation? 
+
