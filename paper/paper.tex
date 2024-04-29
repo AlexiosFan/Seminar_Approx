@@ -22,6 +22,7 @@
 
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{xcolor}
 
 \renewcommand{\thefootnote}{\fnsymbol{footnote}}
 \renewcommand{\baselinestretch}{1.1}
@@ -41,6 +42,8 @@
 \newtheorem{proposition}{Proposition}
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{fact}{Fact}
+
+\setlength\parindent{0pt}
 
 \begin{document}
 
@@ -81,7 +84,7 @@ Hence greedy algorithms are called \textit{primal infeasible} algorithms, while 
 are referred to as \textit{primal feasible} algorithms.
 
 
-\section{Scheduling on Single Machine}
+\section{Scheduling on A Single Machine}
 Scheduling or Job Sequencing, is one of the earliest discovered NP-complete problems. 
 It was amongst the first 21 NP-complete problems published by Karp in 1972. In this section, 
 we examine a simplified version of the problem: only one machine is available for scheduling.
@@ -173,12 +176,10 @@ Again, we start with a lowerbound on the size of the optimal solution.
     \end{align*} 
 \end{lemma}
 \begin{proof}
-    We perform a case distinction
-    \begin{itemize}
-        \item All machines terminate at the same time. In this case, each machine runs exactly the average processing time, i.e. the equality holds in the lemma. 
-        \item At least two machines do not finish at the same time. In this case, the machine that finishes later runs more than the average processing time. Furthermore, the optimal solution has to run no shorter than this machine. 
+    We perform a case distinction.\\
+        \textbf{Case 1:} All machines terminate at the same time. In this case, each machine runs exactly the average processing time, i.e. the equality holds in the lemma. \\
+        \textbf{Case 2:} At least two machines do not finish at the same time. In this case, the machine that finishes later runs more than the average processing time. Furthermore, the optimal solution has to run no shorter than this machine. \\
         Hence the strict inequality holds in the lemma.
-    \end{itemize}
 \end{proof}
 Using the same idea, we observe that the starting time of the last job satisfies an upperbound. 
 \begin{observation}
@@ -198,6 +199,7 @@ Using the same idea, we observe that the starting time of the last job satisfies
 Combining the two observations, we obtain $C_{max}^* > S_j$. Observe that $p_j \leq C_j$ by definition. 
 Hence we obtain the approximation ratio for this local search algorithm.
 \begin{theorem}
+    \label{theorem:localsearch}
     The local search algorithm yields a $2$-approximation ratio.
 \end{theorem}
 \begin{proof}
@@ -206,15 +208,113 @@ Hence we obtain the approximation ratio for this local search algorithm.
         C_{max} = C_j = S_j + p_j \leq C_{maxc}^* + p_j \leq 2C_{max}^*
     \end{align*}
 \end{proof}
-Finally, it suffices to show that the local search algorithm runs in polynomial time. If we manage 
-to show that a job is never moved twice, we can conclude that at most $n$ jobs will be moved. 
+While it is easy to find a approximation ratio, the polynomial time complexity of the local search algorithm 
+is not trivial. Observe that the algorithm terminates only if no job can be moved to improve the schedule. 
+\color{red} omit the analysis(and refinement) here? cuz not enough space \color{black} 
 
 
 
 \subsection{Greedy Algorithm}
 The greedy algorithm is similar to the \textbf{EDD} rule in the previous section. Whenever a machine is available, 
 we assign it a job from the job list. Since there is no release date, the choice is arbitrary. 
-This is referred to as \textbf{list scheduling} algorithm.  
+This is referred to as \textbf{list scheduling} algorithm. The execution of the list scheduling algorithm can 
+be viewed as a special case of the \textbf{local search} algorithm, where the initial schedule cannot be improved.
+\begin{theorem}
+    The \textbf{list scheduling} algorithm yields a $2$-approximation ratio.
+\end{theorem}
+\begin{proof}
+    Let $j$ be the last job completed in a schedule outputed by the \textbf{list scheduling} algorithm. 
+    Suppose the \textbf{local search} algorithm can improve the schedule. 
+    Then we can find a machine such that $S_j' < S_j$ where $S_j'$ is the new starting time of $j$ after moving it to 
+    this new machine. However, the greedy strategy always assigns the job to the first available machine, hence 
+    no such machine exists. Thus, the schedule cannot be improved by \textbf{local search} algorithm. 
+    Hence its approximation ratio can also bounded by $\alpha = 2$ as in theorem \cref{theorem:localsearch}.
+\end{proof}
+If we execute the \textbf{list scheduling} algorithms on some examples \color{red} fill in graphs if needed \color{black}, we can observe that the longer the processing time of the last job, 
+the worse the approximation ratio is. If we process the longer jobs first, and fill in the shorter jobs later,
+the approximation ratio may be improved. This is the idea of the longest processing time rule(\textbf{LPT}).
+As expected it yields a better approximation ratio. 
+\begin{theorem}
+    The \textbf{LPT}-rule algorithm yields a $4/3$-approximation ratio.
+\end{theorem}
+\begin{proof}
+    Recall in lemma \cref{lemma:lowerbound2}, we have proven that the optimal makespan is bounded by the average processing time.
+    Let $E =  \sum_{j=1, \cdots, n} p_j$ as the average processing time.
+    Suppose for contradiction that $C_{max} > \frac{4}{3} C_{max}^*$ for the last completed job $j$. 
+    When $j$ started, its starting time $C_j - p_j$ must be less equal 
+    than $E$. If not, there must have been another machine finishing at time $E$ or earlier, to which we could have moved job $j$
+    for a better schedule. Hence we have 
+    \begin{align*}
+        p_j \geq C_j - E = C_{max} - E > \frac{4}{3}C_{max}^* - C_{max}^* = \frac{1}{3} C_{max}^*
+    \end{align*}
+    In \textbf{LPT}-rule, we can assume the last job completed always has the shortest processing time.
+    If it is not the case, we simply discard the shorter jobs, while the new job list still has the same makespan. 
+    Thus, for each job $i = 1, \cdots, n$, it holds $p_i \geq p_j > \frac{1}{3}C_{max}^*$. 
+    There are hence at most two jobs on each machine, otherwise the optimal makespan would exceed $C_{max}^*$. 
+    We are able to show that \textbf{LPT}-rule yields the optimal solution by case distinction. 
+    
+    \textbf{Case 1:} There is no job processed before $j$ on the same machine. Since $j$ is the shortest job, 
+    we conclude that each machine processes at most one job, and the optimal solution is obtained.\\
+    \textbf{Case 2:} There is a job processed before $j$ on the same machine. Since there are at most two jobs on each 
+    machine, we may assume that there are $k + k'$ jobs in total, where $k' \leq k$. 
+    Sort the jobs reversely with regard to their processing time. The optimal schedule is assigning $(k + i)$-th job 
+    directly after the $i$-th job, where $i < k'$. If $(k+k')$-th job is assigned after a job finishing later than $k'$-th job, it will 
+    definitely finishes later than the optimal schedule. If it is assigned after a job finishing earlier than $k'$-th job, 
+    a job that takes longer will be assigned after the $k'$-th job, which is also suboptimal.\\
+    To summarize, the optimal schedule is obtained by the \textbf{LPT}-rule algorithm, which contradicts with the assumption $C_{max} > \dfrac{4}{3} C_{max}^*$.
+\end{proof}
+
+\section{k-Center Problem}
+Many graph problems are known to be \NP-hard. Furthermore, greedy algorithms are known to be useful in computing 
+many graph structures in polynomial-time such as minimum spanning trees, shortest paths etc. Unaccidentally, 
+this strategy is also useful in term of approximation algorithms. 
+In the following sections, we introduce the approximation for $k$-center problem, travelling salesman problem, and edge coloring. \\
+K-center problem is a classical problem in computational geometry. It is also related to well-studied k-means clustering in machine learning. 
+The problem is defined as follows.
+\begin{definition}[k-Center]
+    Given a set of $n$ points $P$ in a metric space with distance function $|\cdot|$. 
+    Find $k$ centers $S \subseteq P$ s.t. the maximal distance from any point to its nearest center is minimized.
+    \begin{align*}
+        r = \max_{p \in P} d(p, S)
+    \end{align*}
+    where $d(p, S) = \min_{s \in S} |s - p| $
+\end{definition}
+The problem can be reduced to a problem in undirected weighted graph, where the weight is the distance between two vertices. 
+The greedy algorithm for this problem starts with an arbitrary center. In each iteration, we pick the point that 
+is farthest from the current centers, i.e. choosing $\arg \max d(p, S)$ from $p \in P \backslash S$. 
+By adding such point to the center set in $(k-1)$ iterations, we obtain an approximation for the $k$-center problem.
+\begin{theorem}
+    The presented greedy problem yields a $2$-approximation ratio for the $k$-center problem.
+\end{theorem}
+\begin{proof}
+    Let $r^*$ denote the optimal distance radius. 
+    The distance between any point $p$ to its nearest center is bounded by $|p - s| \leq r^*$. 
+    Let $q$ be another point from the same cluster. By triangular inequality, we have 
+    \begin{align*}
+        |p - q| \leq |p - s| + |s - q| \leq 2r^*    
+    \end{align*}
+    Thus, the distance between points in the same cluster is bounded by $2r^*$. If the presented greedy algorithm
+    chooses a center from each cluster, the approximation ratio is guaranteed. For an arbitrary point, if the center from 
+    its cluster is its nearest neighbor, the presented bound of $2r^*$ is sufficient. 
+    Otherwise, there would be a nearer center, which is also dominated by the bound of $2r^*$.  \\
+    A more interesting case is when not all clusters have a point selected as center. 
+    There would be then at least two points, $p$ and $q$,  from the same cluster. By the presented upperbound, 
+    we know $|p - q| \leq 2r^*$. In our algorithm, we always choose the point with maximal $d(p, S)$. Hence 
+    when both $p$ and $q$ were added into $S$, it holds
+    \begin{align*}
+        d(p', S) \leq d(p, S) \leq |p - q| \leq 2r^*
+    \end{align*} 
+    for an arbitrary $p'$ not in $S$, which justifies the $2$-approximation ratio for points whose cluster has no center selected.
+\end{proof}
+In fact, $\alpha = 2$ is the best possible approximation for the $k$-center problem, if $\PTIME \neq \NP$. To prove this, 
+we reduce the $k$-center problem from the dominating set problem. Note that it is a decision problem.
+\begin{definition}[Dominating Set]
+    Given an undirected graph $G = (V, E)$, we need to find a set $S \subseteq V$ of size $k$ s.t. each vertex in $V$ is either in $S$ or adjacent to a vertex in $S$.
+\end{definition}
+\begin{theorem}
+    If there is polynomial-time approximation algorithm for the $k$-center problem with $\alpha < 2$, then there is a polynomial-time approximation algorithm for the dominating set problem with $\alpha < 2$.
+\end{theorem}
+
 
 
 
