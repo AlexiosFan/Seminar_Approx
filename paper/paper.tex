@@ -32,6 +32,8 @@
 \newcommand*{\PTIME}{\textbf{P}}
 \newcommand*{\NP}{\textbf{NP}}
 \newcommand*{\bigo}[1]{\mathcal{O}(#1)}
+\newcommand*{\mst}{\textbf{MST}}
+\newcommand*{\tsp}{\textbf{TSP}}
 
  
 \newtheorem{theorem}{Theorem}
@@ -268,10 +270,10 @@ As expected it yields a better approximation ratio.
 Many graph problems are known to be \NP-hard. Furthermore, greedy algorithms are known to be useful in computing 
 many graph structures in polynomial-time such as minimum spanning trees, shortest paths etc. Unaccidentally, 
 this strategy is also useful in term of approximation algorithms. 
-In the following sections, we introduce the approximation for $k$-center problem, travelling salesman problem, and edge coloring. \\
-K-center problem is a classical problem in computational geometry. It is also related to well-studied k-means clustering in machine learning. 
+In the following sections, we introduce the approximation for $k$-Center, Travelling Salesman Problem, and Edge Coloring. \\
+$k$-Center is a classical problem in computational geometry. It is also related to well-studied $k$-means clustering in machine learning. 
 The problem is defined as follows.
-\begin{definition}[k-Center]
+\begin{definition}[$k$-Center]
     Given a set of $n$ points $P$ in a metric space with distance function $|\cdot|$. 
     Find $k$ centers $S \subseteq P$ s.t. the maximal distance from any point to its nearest center is minimized.
     \begin{align*}
@@ -282,9 +284,9 @@ The problem is defined as follows.
 The problem can be reduced to a problem in undirected weighted graph, where the weight is the distance between two vertices. 
 The greedy algorithm for this problem starts with an arbitrary center. In each iteration, we pick the point that 
 is farthest from the current centers, i.e. choosing $\arg \max d(p, S)$ from $p \in P \backslash S$. 
-By adding such point to the center set in $(k-1)$ iterations, we obtain an approximation for the $k$-center problem.
+By adding such point to the center set in $(k-1)$ iterations, we obtain an approximation for $k$-Center .
 \begin{theorem}
-    The presented greedy problem yields a $2$-approximation ratio for the $k$-center problem.
+    The presented greedy problem yields a $2$-approximation ratio for $k$-Center .
 \end{theorem}
 \begin{proof}
     Let $r^*$ denote the optimal distance radius. 
@@ -306,17 +308,210 @@ By adding such point to the center set in $(k-1)$ iterations, we obtain an appro
     \end{align*} 
     for an arbitrary $p'$ not in $S$, which justifies the $2$-approximation ratio for points whose cluster has no center selected.
 \end{proof}
-In fact, $\alpha = 2$ is the best possible approximation for the $k$-center problem, if $\PTIME \neq \NP$. To prove this, 
-we reduce the $k$-center problem from the dominating set problem. Note that it is a decision problem.
+In fact, $\alpha = 2$ is the best possible approximation for $k$-Center , if $\PTIME \neq \NP$. To prove this, 
+we reduce $k$-Center from Dominating Set, which is an \NP-hard decision problem.
 \begin{definition}[Dominating Set]
     Given an undirected graph $G = (V, E)$, we need to find a set $S \subseteq V$ of size $k$ s.t. each vertex in $V$ is either in $S$ or adjacent to a vertex in $S$.
 \end{definition}
+\begin{lemma}
+    If there is polynomial-time approximation algorithm for $k$-Center  with $\alpha < 2$, 
+    then there is a polynomial-time algorithm for deciding Dominating Set.
+\end{lemma}
+\begin{proof}
+    We start with a reduction from Dominating Set to $k$-Center. For an instance of Dominating Set, 
+    let the distance between adjacent vertices be $1$, and the distance between non-adjacent vertices be $2$. It is easy to see 
+    that there exists a Dominating Set of size $k$ if and only if there exists a $k$-Center with radius $1$. 
+    If $k$-Center is approximated with $\alpha < 2$, the radius given by this problem would be 
+    \begin{align*}
+    r = \lfloor \alpha r^* \rfloor = \lfloor \alpha \rfloor = 1
+    \end{align*}
+    Hence the approximation yields the optimal solution for $k$-Center , which results 
+    in a polynomial-time algorithm to decide Dominating Set.
+\end{proof}
+Since Dominating Set is \NP-hard, we may conclude that $\alpha = 2$ is the best possible approximation given that $\PTIME = \NP$ is not solved yet. 
 \begin{theorem}
-    If there is polynomial-time approximation algorithm for the $k$-center problem with $\alpha < 2$, then there is a polynomial-time approximation algorithm for the dominating set problem with $\alpha < 2$.
+    $k$-Center cannot be approximated with $\alpha < 2$ unless $\PTIME = \NP$.
 \end{theorem}
 
+\section{Traveling Salesman Problem}
+The Traveling Salesman Problem(\textbf{TSP}) is one of the most studied combinatorial optimization problem.
+In this problem, we want to minimize the total cost of the saleperson's tour that visits each city and returns to 
+the initial city. By convention, we assume the cost between two city is non-negative and symmetric.  
+\begin{definition}[TSP]
+    Give an undirected completed graph $G = (V, E)$ and a cost function $c: E \rightarrow \mathbb{R}^+$, find a path $\pi \in V^*$
+    such that all vertices in $V$ exist exactly once in $\pi$ and its total cost is minimized.
+\end{definition}
+For a general case of \textbf{TSP}, a polynomial-time approximation exists if and only if $\PTIME = \NP$. This is proven 
+by a reduction from Hamiltonian Cycle to \textbf{TSP}.
+\begin{definition}[Hamiltonian Cycle]
+    Given an undirected graph $G = (V, E)$, find a cycle that visits each vertex exactly once.
+\end{definition}
+\begin{theorem}
+    For any $\alpha > 1$, Hamiltonian Cycle is solvable in polynomial time if there is a polynomial-time $\alpha$-approximation algorithm 
+    for \textbf{TSP}.
+\end{theorem}
+\begin{proof}
+    Given an instance of Hamiltonian Cycle $G = (V, E)$, we need to fill in the missing edges such that $G$ becomes 
+    a completed graph for \textbf{TSP}. Pick $\alpha > 1$ arbitrarily. 
+    We assign a cost of $1$ to the existing edges, and a cost of $(\alpha - 1) n + 2$ to the missing 
+    edges where $n = |V|$. If there is a Hamiltonian Cycle in $G$, the total cost of the tour is $n$. 
+    Otherwise, the total cost of the cycle is at least $\alpha n + 1$. If there exists a polynomial-time $\alpha$-approximation algorithm 
+    for \textbf{TSP}, the cost outputed by this algorithm is at most $\alpha n < \alpha n + 1$. Thus, there exists a 
+    Hamiltonian Cycle in $G$ if such approximation exists.  
+\end{proof}
+Since a polynomial-time approximation is not possible for general \textbf{TSP}. We may wonder if any constraints 
+can be added to the problem to enable a polynomial-time approximation. If we consider the cost function as the distance between 
+two real cities, an interesting property, the triangular inequality, can be exploited. 
+In fact, the triangular inequality holds for any metric space. Hence we may consider the \textbf{metric TSP} problem.
+\begin{definition}[metric TSP]
+    Let $G = (V, E)$ and $c: E \rightarrow \mathbb{R}^+$ be an instance of \textbf{TSP}. It is an instance of metric \textbf{TSP} 
+    if and only if the triangular inequality holds for all edges in $E$.
+    \begin{align*}
+        \forall i, j, k \in V. c(i, j) + c(j, k) \geq c(i, k)
+    \end{align*}
+\end{definition} 
+Whle a round trip in metric \textbf{TSP} visits all cities and return to the initial city, a minimum spanning tree(\textbf{MST})
+connects all cities with minimum total cost without forming a cycle. We may wonder if \textbf{MST} can be used for analysis of 
+approximation or simply as a sub-routine in the algorithm. In fact, if we break any edge in the round trip, a spanning tree 
+can be obtained. This spanning tree must have a total cost less than or equal to the cost of the \textbf{MST}. This 
+leads to the following lemma. 
+\begin{lemma}
+    \label{lemma:MST}
+    For any metric \textbf{TSP} instance, the cost of the optimal tour is at least the cost of the \textbf{MST} on the same 
+    instance.
+\end{lemma}
+From now on, we denote the cost of the \textbf{MST} as $c_{MST}$ and the cost the optimal tour as $c^*$. \cref{lemma:MST} then 
+yields $c_{MST} \leq c^*$. which is useful in the proofs of the next three algorithms. 
 
+\subsection{A Greedy Algorithm}
+The simplest idea of a greedy algorithm for \textbf{TSP} is adding a vertice with the lowest cost until all vertices are visited. 
+This is referred to as the \textit{nearest addition algorithm}. To be more specific, the algorithm starts with a round tour between an arbitary vertice and its 
+nearest neightbor. In each iteration, let $S$ be the set of vistied cities. We pick $v \in S$ and $u \not\in S$ such that 
+$c(u, v)$ is minimized. Let $w$ be the vertex folloing $v$ in the current tour. We discard the edge $(v, w)$ and add $(v, u)$ and $(u, w)$ to the tour.
+The algorithm terminates when all vertices are visited, and hence runs in linear time. 
+One may observe that the greedy strategy for \textit{nearest addition algorithm} is similar to that of \textit{Prim's algorithm} for \textbf{MST}.
+Combining this observation and \cref{lemma:MST}, we obtain the following theorem. \color{red} cite prim \color{black}
+\begin{theorem}
+    The \textit{nearest addition algorithm} yields a $2$-approximation ratio for metric \textbf{TSP}.
+\end{theorem}
+\begin{proof}
+    Consider the edge $e = (u, v)$ found in each iteration. We claim that $e$ is exactly the same edge found by \textit{Prim's algorithm}.
+    In each step, \textit{Prim's algorithm} also chooses the minimum cost edge $e' = (v', u')$ such that $v' \in S$ and $u' \not\in S$, while 
+    $S$ is the \mst builded step by step. While the sets of edges that we preserve between iterations are different in two algorithms, 
+    the set of vertices $S$ is exactly the same. Hence the edge $e$ is the same as $e'$. 
+    Let $T$ be the set of edges picked in the iterations along with the initial edge. Apparently $T$ is an \mst. The next step is bounding 
+    the cost of round tour with the cost of $T$. \\
+    Conisder the cost change in each iteration. While $(u, v)$ and $(v, w)$ are added to the tour, $(u, w)$ is removed. The cost change is $c(u, v) + c(v, w) - c(u, w)$.
+    Using the triangular inequality, we have $c(u, v) + c(u, w) \geq c(v, w)$. Combining both, we obtain 
+    \begin{align*}
+        c(u, v) + c(v, w) - c(u, w) \leq 2c(u, v)
+    \end{align*}
+    Recall that the initial cost of the tour in \textit{nearest addition algorithm} is $2c(e_0)$ where $e_0$ is the initial edge, because we started 
+    with a round tour between two vertices. Since each $(u, v)$ chosen in the iteration is distinct, the total cost of the tour is bounded by 
+    the twice of the cost of $T$. Applying \cref{lemma:MST}, we have
+    \begin{align*}
+        c \leq 2 c_{MST} \leq 2 c^*
+    \end{align*}
+    which justifies the $2$-approximation ratio.
+\end{proof}
 
+\subsection{A Little Help from Euler}
+While Hamiltonian Cycle is \NP-hard, deciding if there is a path that traverse each edge exactly once 
+is solvable in polynomial time. This is known as Eulerian Path. Thanks to Euler's efforts 
+in brdiges of K\"onigsberg, we know that a graph has an Eulerian Path if all vertices have even degree. \\
+Here comes an even simpler greedy algorithm: compute the \mst, create a copy of each 
+edge and add those copies back to the \mst. The resulting graph has a Eulerian Path. Find a Eulerian Path 
+\begin{align*}
+    \pi = (v_1, v_2)\cdots(v_i, v_{i+1})\cdots(v_{n-1}, v_n)    
+\end{align*}
+We now have a tour visiting each vertex, but we still have 
+to remove all the repeated vertices. This is also simple: remove all repeated existence of vertices in $\pi$, 
+connect the gap between two vertices with the edge from the original graph. In fact, this is just the same as 
+the \textit{nearest addition algorithm} with a manner of analysis. Thus, this \textit{double-tree algorithm}
+has exactly the same approximation ratio. 
+\begin{theorem}
+    The \textit{double-tree algorithm} yields a $2$-approximation ratio for metric \textbf{TSP}. 
+    \label{theorem:double-tree}   
+\end{theorem}
+\begin{proof}
+    The Eulerian Path over the \mst\ has the cost of $2c_{MST}$, which is already a nice upperbound. 
+    It suffices to show that the modification on the Eulerian Path does not increase the cost. \\
+    Let $v_i$ and $v_j$ be two vertices in the Eulerian Path. Furthermore, they have their first existence at $i$-th and $j$-th position respectively.
+    Suppose all vertices between them have existed ealier than $v_i$. We have to remove the edges $(v_i, v_{i+1}), \cdots, (v_{j-1}, v_j)$, 
+    and insert a new edge $(v_i, v_j)$ into the path. The cost change would be 
+    \begin{align*}
+        c_i = c(v_i, v_j) - \sum_{k = i}^{j-1} c(v_k, v_{k+1})
+    \end{align*}
+    By applying triangular inequality repeatedly, we are able to show $c_i \leq 0$ \color{red} visualization if needed \color{black}. 
+    This simply means that the modification in each step does not increase the cost. Hence the 2-approximation ratio is justified.
+\end{proof}
+
+\subsection{A Little More Help from Christofides}
+Copying the edges of the \mst\ is a simple idea, but it is not the best idea. Is there other way to 
+construct a Eulerian Path with less cost? The answer is yes. Christofides proposed a $\frac{3}{2}$-approximation 
+taking advantage of Perfect Matching.
+\begin{definition}[Perfect Matching]
+    Given a graph $G = (V, E)$. A matching is a set edges such that no two edges share a common vertex.
+    A matching is perfect if and only if each vertex in $V$ is incident to exactly one edge in the matching.
+\end{definition}
+How do we take advantage of Perfect Matching? We would like to return to the existence of Eulerian Path. 
+For any tree, there exists no Eulerian Path, for leaves can only have odd degree. However, if we connect 
+them with edges from perfect matching, the degree of each vertex becomes even. This not only applies to 
+leaves, but also internal nodes with odd degree. Let $O$ be the set of vertices with odd degree in the \mst.
+We still need to prove that there exists a perfect matching. 
+\begin{lemma}
+    \label{lemma:odd}
+    For any tree $T$, the number of vertices with odd degree is even.
+\end{lemma}
+\begin{proof}
+    In any graph, we have $|E| = 2|V|$ and $\sum_{v \in V} \deg(v) = 2|E|$. Observe that the sum of even numbers 
+    is always even. Hence the total degree of vertices with even degree is even. We denote this value with $2k$.
+    It follows that the total degree of vertices with odd degree is also even.
+    \begin{align*}
+        \sum_{v \in O} \deg(v) = \sum_{v \in V} \deg(v) - \sum_{v \in V \backslash O} \deg(v) = 2|E| - 2k = 2(|E| - k)
+    \end{align*}
+    Since the sum of odd numbers is even if and only if the number of odd numbers is even, the lemma is proven.
+\end{proof}
+\cref{lemma:odd} shows that $|O|$ is even. In addition, we have a complete graph in \tsp. Thus, there exists 
+a perfect matching in $O$. We add the edges of the perfect matching to the \mst, obtaining a graph with a 
+Eulerian Path. The rest of the work is the same as the \textit{double-tree algorithm}. 
+It can be inferred that the modification on the Eulerian Path does not increase the cost as in the proof of 
+\cref{theorem:double-tree}. The approximatin ratio for \textit{Christofides' algorithm} is dependent on the size 
+of the Perfect Matching.
+\begin{theorem}
+    Christofides' algorithm yields a $\frac{3}{2}$-approximation ratio for metric \textbf{TSP}.
+\end{theorem}
+\begin{proof}
+    We construct a tour on vertices from $O$. This can be constructed from the optimal tour. 
+    Let $v$ and $u$ be two vertices from $O$ between which there is only vertices not from $O$. 
+    Using the same idea as in \cref{theorem:double-tree}, we discard those intermediate vertices and 
+    insert a new edge $(v, u)$. The cost never increases. Let $c_O$ denote the cost of this tour, 
+    it holds 
+    \begin{align*}
+        c_O \leq c^*
+    \end{align*}
+    Since the number of vertices is even, the number of edges in this tour is also even. We can then 
+    construct two Perfect Matchings by coloring: pick an arbitrary edge with color $1$, and 
+    color its neighbor with color $2$. Repeat the procedure until all edges are colored. 
+    We always pick the smaller one for \textit{Christofides' algorithm}.
+    Let $c_1$ and $c_2$ be the cost of the two Perfect Matchings. It follows 
+    \begin{align*}
+        \min(c_1, c_2) \leq \dfrac{2 \cdot \min(c_1, c_2)}{2} \leq \dfrac{c_1 + c_2}{2} \leq \dfrac{c_O}{2} \leq \dfrac{c^*}{2}
+    \end{align*}
+    Hence the size of the Eulerian Path in \textit{Christofides' algorithm} is bounded by 
+    \begin{align*}
+        c_{\text{Christofides}} = c_{MST} + \min(c_1, c_2) \leq \dfrac{3}{2} c^*
+    \end{align*}
+    which justifies the $\frac{3}{2}$-approximation ratio.
+\end{proof}
+
+\section{Conclusion}
+In this paper, we studied the techniques of local search and greedy algorithms in 
+the context of approximation algorithms. We explored two topics, scheduling and graph problems. 
+For all studied problems, a nice constant approximation ratio is obtained. There are also 
+other techniques in approximation such as linear programming, randomization, and primal-dual method etc.
+We also noticed that there is a limit for the approximation ratio for some problems. 
+This leaves people with space and imagination to explore larger questions of \NP-completeness and other complexity classes such as \textbf{APX}. 
 
 \begin{thebibliography}{10}
 \setlength{\itemsep}{0pt plus .3pt}
