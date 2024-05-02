@@ -52,11 +52,9 @@
 \title{Approximation Algorithms: Greedy Algorithm and Local Search}
 \author{Zixuan Fan\thanks{Department of Computer Science, Technical University of Munich. {\tt ge43yeb@mytum.de}}}
 \maketitle
-
 \section{Introduction}
-The theory of computer science has grown significant throughout the past century. Among many topics, \NP-hardness has drawn the attention of many researchers. 
-While there is no proof whether $\PTIME=\NP$, people tend to be interested in compensation: solving NP-hard problems with a sub-optimal solution in polynomial time.
-This is the motivation of approximation algorithms. This paper introduces two fundamental techniques in designing approximation algorithms: greedy algorithm and local search.
+The theory of computer science has grown significantly throughout the past century. Among many topics, \NP-hardness has drawn the attention of many researchers. 
+While there is no proof whether $\PTIME=\NP$, people tend to be interested in compensation: solving NP-hard problems with a sub-optimal solution in polynomial time, which is the motivation of approximation algorithms. This paper introduces two fundamental techniques in designing approximation algorithms: greedy algorithm and local search.
 We start with some mathematical backgrounds, followed by a brief introduction of greedy and local search. 
 Then, we present a few examples that exploit these techniques.
 
@@ -76,23 +74,23 @@ The approximation ratio $\alpha$ shows how close the solution $Opt$ is to the op
 for a minimization problem. The better the approximation, the closer $\alpha$ is to 1.
 
 \subsection{Greedy Algorithms and Local Search}
-Both greedy algorithms and local search contructs the solution step by step. 
-In each step, the strategy makes certain desicions such that the result is locally optimal. 
-The difference between two techniques lies in the strategy of making decisions. 
-The greedy algorithms try to make the best decision at each step, the solution is not guaranted to 
-be \textit{feasible} at the beginning. On the other hand, local search starts with an arbitrary feasible solution,
+Both greedy algorithms and local search construct the solution step by step. 
+In each step, the strategy makes certain decisions to optimize the result locally. 
+The difference between the two techniques lies in the strategy of making decisions. 
+The greedy algorithms try to make the best decision at each step, and the solution is not guaranteed to 
+be \textit{feasible} at the beginning. On the other hand, local search starts with an arbitrary feasible solution
 and maintains the feasibility while improving the solution. 
-Hence greedy algorithms are called \textit{primal infeasible} algorithms, while local search algorithms 
+Hence, greedy algorithms are called \textit{primal infeasible} algorithms, while local search algorithms 
 are referred to as \textit{primal feasible} algorithms.
 
 
 \section{Scheduling on A Single Machine}
-Scheduling or Job Sequencing, is one of the earliest discovered NP-complete problems. 
+Scheduling, or Job Sequencing, is one of the earliest discovered NP-complete problems. 
 It was amongst the first 21 NP-complete problems published by Karp in 1972. In this section, 
 we examine a simplified version of the problem: only one machine is available for scheduling.
 \begin{definition}[Scheduling on Single Machine]
     Given $n$ jobs to be processed with processing time $p_j$, release time $r_j \geq 0$, and deadline $d_j$ with $j = 1, \cdots, n$.
-    Suppose $j$-th job is completed at time $C_j$, we define the lateness as $L_j = C_j - d_j$. The goal is minimizing the maximal lateness 
+    Suppose $j$-th job is completed at time $C_j$. We define the lateness as $L_j = C_j - d_j$. The goal is to minimize the maximal lateness 
     \begin{align*}
         L_{max} = \max_{j = 1, \cdots, n} L_j
     \end{align*}
@@ -105,37 +103,37 @@ Here, a job is \textit{available} at time $t$ if $r_j \leq t$.
 
 To analyze the algorithm, we have to introduce a few notations. Let $S$ denote a set of jobs, $r(S) = \min_{j \in S} r_j$, $p(S) = \sum_{j \in S} p_j$, 
 and $d(S) = \max_{j \in S} d_j$. While $L_{max}$ denotes the maximal lateness computed by the algorithm, $L_{max}^*$ denotes the optimal solution. 
-As preparation, an interesting lowerbound on the optimal solution is observed. 
+As preparation, an interesting lower bound on the optimal solution is observed. 
 \begin{lemma}
     \label{lemma:lowerbound}
     For any set of jobs $S$, $L_{max}^* \geq r(S) + p(S) - d(S)$
 \end{lemma}
 \begin{proof}
-    Suppose job $j$ is the last finished job in the optimal schedule. The scheduling cannot start until $r(S)$. In an optimal schedule, there is no gap between the processing of jobs, all jobs 
-    are processed consecutively in $p(S)$. Hence $j$ cannot be finished until $r(S) + p(S)$. In addition, we have $d_j \leq d(S)$ by definition. It follows 
+    Suppose job $j$ is the last finished job in the optimal schedule. The scheduling cannot start until $r(S)$. In an optimal schedule, there is no gap between the processing of jobs, and all jobs 
+    are processed consecutively in $p(S)$. Hence, $j$ cannot be finished until $r(S) + p(S)$. In addition, we have $d_j \leq d(S)$ by definition. It follows 
     \begin{align*}
         L_{max}^* \geq L_j = C_j - d_j \geq r(S) + p(S) - d_j \geq r(S) + p(S) - d(S)
     \end{align*} 
 \end{proof}
 We then take a closer look at the \textbf{EDD} rule. Suppose the release time $r_j$, processing time $p_j$, and the deadline $d_j$ are encoded as a ternary tuple $(r_j, p_j, d_j)$.
-The only part the requires heavy computation for \textbf{EDD} rule is choosing the job with the earliest due date.
-The easiest implementation is preserve a linked list to store the information of each job, which takes $\bigo{n^2}$ time in total. 
-A more efficient implementation takes advantage of a FIFO queue, which takes only $\bigo{n}$ time. In either cases, 
+The only part that requires heavy computation for \textbf{EDD} rule is choosing the job with the earliest due date.
+The easiest implementation is to preserve a linked list to store the information of each job, which takes $\bigo{n^2}$ time in total. 
+A more efficient implementation takes advantage of a FIFO queue, which takes only $\bigo{n}$ time. In either case, 
 the algorithm runs in polynomial time. This directly leads to the following theorem.
 \begin{theorem}
     The EDD-rule algorithm runs in polynomial time. 
 \end{theorem}
-What we care more in the context of approximation algorithms is the approximation ratio. We then show that the algorithm yields the promised approximation ratio.
+What we care more about in the context of approximation algorithms is the approximation ratio. We then show that the algorithm yields the promised approximation ratio.
 \begin{theorem}
     The EDD-rule algorithm yields a 2-approximation ratio.
 \end{theorem}
 \begin{proof}
     Suppose $j$ is the job with the maximal lateness in the schedule generated by the \textbf{EDD} rule.
-    Let $t$ be the earliest time such that the machine keeps processing jobs continuously in the interval $[t, C_j]$.
+    Let $t$ be the earliest time for the machine to keep processing jobs continuously in the interval $[t, C_j]$.
     Let $S$ be the set of jobs that are processed in this interval. In our assumption, $r(S) = t$ is guaranteed. 
     Suppose for contradiction that $r(S) > t$, the processing would not be able to start at time $t$. 
     Similarly, if $r(S) < t$, the processing would start earlier than $t$. Both cases contradict the assumption.
-    Furthermore, $p(S) = C_j - t$, for the processing is continuous and it stops at time $C_j$. Applying lemma \cref{lemma:lowerbound},
+    Furthermore, $p(S) = C_j - t$, for the processing is continuous, and it stops at time $C_j$. Applying lemma \cref{lemma:lowerbound},
     we obtain 
     \begin{align*}
         L_{max}^* \geq r(S) + p(S) - d(S) = t + C_j - t - d(S) = C_j - d(S) \geq C_j
@@ -144,7 +142,7 @@ What we care more in the context of approximation algorithms is the approximatio
     \begin{align*}
         L_{max}^* \geq r(S) + p(S) - d(S) \geq -d(S) \geq -d_j
     \end{align*}
-    Observe that $L_{max} = C_j - d_j$. Hence in this schedule, it holds 
+    Observe that $L_{max} = C_j - d_j$. Hence, it holds for this schedule
     \begin{align*}
         L_{max} = C_j - d_j \leq 2L_{max}^*
     \end{align*}
@@ -153,7 +151,7 @@ What we care more in the context of approximation algorithms is the approximatio
 
 \section{Scheduling on Identical Parallel Machines}
 Just as we can run $k$-bands of Turing machines in parallel, jobs can be processed simultaneously on 
-$k$ machines, if available. The problem setting is then a bit different: there is no release date of jobs, and 
+$k$ machines, if available. The problem setting is then different: there is no release date for jobs, and 
 the optimization goal is to minimize the time all jobs are finished. 
 \begin{definition}[Job Scheduling on Identical Parallel Machines]
     Given $n$ jobs to be processed on $k$ identical parallel machines, each job $j$ has a processing time $p_j$ with $j = 1, \cdots, n$.
@@ -167,23 +165,23 @@ are both simple, while the analysis requires some effort.
 
 \subsection{Local Search Algorithm}
 The local search algorithm starts with an arbitrary schedule. In each step, we try to find a better schedule for the last job to be completed. 
-More specifically, we traverse all machines, and try to move the job to another machine such that it finishes earlier. 
-Whenever no such move is possible, the algorithm terminates. To simply the analysis, we assume that there is no idle time on any machine in the initial schedule.  
-Again, we start with a lowerbound on the size of the optimal solution. 
+More specifically, we traverse all machines and try to move the job to another machine so that it finishes earlier. 
+Whenever no such move is possible, the algorithm terminates. To simplify the analysis, we assume that there is no idle time on any machine in the initial schedule.  
+Again, we start with a lower bound on the size of the optimal solution. 
 \begin{lemma}
     \label{lemma:lowerbound2}
-    For a scheduling problem with $n$ jobs and $k$ identical machines, its optimal makespan is less equal than the average processing time of all jobs.
+    For a scheduling problem with $n$ jobs and $k$ identical machines, its optimal makespan is less than or equal to the average processing time of all jobs.
     \begin{align*}
         C_{max}^* \geq \frac{1}{k} \sum_{j=1, \cdots, n} p_j
     \end{align*} 
 \end{lemma}
 \begin{proof}
     We perform a case distinction.\\
-        \textbf{Case 1:} All machines terminate at the same time. In this case, each machine runs exactly the average processing time, i.e. the equality holds in the lemma. \\
+        \textbf{Case 1:} All machines terminate at the same time. In this case, each machine runs exactly the average processing time, i.e., the equality holds in the lemma. \\
         \textbf{Case 2:} At least two machines do not finish at the same time. In this case, the machine that finishes later runs more than the average processing time. Furthermore, the optimal solution has to run no shorter than this machine. \\
-        Hence the strict inequality holds in the lemma.
+        Hence, strict inequality is held in the lemma.
 \end{proof}
-Using the same idea, we observe that the starting time of the last job satisfies an upperbound. 
+Using the same idea, we observe that the starting time of the last job satisfies an upper bound. 
 \begin{observation}
     \label{observation:upperbound}
     Let $j$ be the last job completed in the local search algorithm. We denote its starting time as $S_j = C_j - p_j$. It holds 
@@ -192,14 +190,14 @@ Using the same idea, we observe that the starting time of the last job satisfies
     \end{align*}
 \end{observation}
 \begin{proof}
-    If the last job is completed just as the average processing time, its starting time has to be strictly less than the average processing time. 
+   If the last job is completed as soon as the average processing time, its starting time has to be strictly less than the average processing time. 
     Otherwise, we suppose for contradiction that $S_j > \frac{1}{k} \sum_{j=1, \cdots, n} p_j$. By the strategy of the local search algorithm,
-    all other machines are still running at time $S_j$, otherwise the job can be moved to another machine. Hence all machines terminate 
+    all other machines are still running at time $S_j$. Otherwise, the job can be moved to another machine. Hence, all machines terminate 
     later than $S_j$, implying that all machines terminate later than the average processing time. Since not all machines can terminate later than 
     the average processing time, this is a contradiction. 
 \end{proof}
 Combining the two observations, we obtain $C_{max}^* > S_j$. Observe that $p_j \leq C_j$ by definition. 
-Hence we obtain the approximation ratio for this local search algorithm.
+Hence, we obtain the approximation ratio for this local search algorithm.
 \begin{theorem}
     \label{theorem:localsearch}
     The local search algorithm yields a $2$-approximation ratio.
@@ -210,8 +208,8 @@ Hence we obtain the approximation ratio for this local search algorithm.
         C_{max} = C_j = S_j + p_j \leq C_{maxc}^* + p_j \leq 2C_{max}^*
     \end{align*}
 \end{proof}
-While it is easy to find a approximation ratio, the polynomial time complexity of the local search algorithm 
-is not trivial. Observe that the algorithm terminates only if no job can be moved to improve the schedule. 
+While it is easy to find an approximation ratio, the polynomial time complexity of the local search algorithm 
+is not trivial. Observe that the algorithm terminates only when no job can be moved to improve the schedule. 
 \color{red} omit the analysis(and refinement) here? cuz not enough space \color{black} 
 
 
@@ -225,17 +223,17 @@ be viewed as a special case of the \textbf{local search} algorithm, where the in
     The \textbf{list scheduling} algorithm yields a $2$-approximation ratio.
 \end{theorem}
 \begin{proof}
-    Let $j$ be the last job completed in a schedule outputed by the \textbf{list scheduling} algorithm. 
+    Let $j$ be the last job completed in a schedule output by the \textbf{list scheduling} algorithm. 
     Suppose the \textbf{local search} algorithm can improve the schedule. 
-    Then we can find a machine such that $S_j' < S_j$ where $S_j'$ is the new starting time of $j$ after moving it to 
-    this new machine. However, the greedy strategy always assigns the job to the first available machine, hence 
+    Then, we can find a machine such that $S_j' < S_j$ where $S_j'$ is the new starting time of $j$ after moving it to 
+    this new machine. However, the greedy strategy always assigns the job to the first available machine, so 
     no such machine exists. Thus, the schedule cannot be improved by \textbf{local search} algorithm. 
-    Hence its approximation ratio can also bounded by $\alpha = 2$ as in theorem \cref{theorem:localsearch}.
+    Hence, its approximation ratio can also bounded by $\alpha = 2$ as in theorem \cref{theorem:localsearch}.
 \end{proof}
 If we execute the \textbf{list scheduling} algorithms on some examples \color{red} fill in graphs if needed \color{black}, we can observe that the longer the processing time of the last job, 
-the worse the approximation ratio is. If we process the longer jobs first, and fill in the shorter jobs later,
+the worse the approximation ratio is. If we process the longer jobs first and fill in the shorter jobs later,
 the approximation ratio may be improved. This is the idea of the longest processing time rule(\textbf{LPT}).
-As expected it yields a better approximation ratio. 
+As expected, it yields a better approximation ratio. 
 \begin{theorem}
     The \textbf{LPT}-rule algorithm yields a $4/3$-approximation ratio.
 \end{theorem}
@@ -243,16 +241,16 @@ As expected it yields a better approximation ratio.
     Recall in lemma \cref{lemma:lowerbound2}, we have proven that the optimal makespan is bounded by the average processing time.
     Let $E =  \sum_{j=1, \cdots, n} p_j$ as the average processing time.
     Suppose for contradiction that $C_{max} > \frac{4}{3} C_{max}^*$ for the last completed job $j$. 
-    When $j$ started, its starting time $C_j - p_j$ must be less equal 
-    than $E$. If not, there must have been another machine finishing at time $E$ or earlier, to which we could have moved job $j$
+    When $j$ started, its starting time $C_j - p_j$ must be less than or equal to
+ $E$. If not, there must have been another machine finishing at time $E$ or earlier, to which we could have moved job $j$
     for a better schedule. Hence we have 
     \begin{align*}
         p_j \geq C_j - E = C_{max} - E > \frac{4}{3}C_{max}^* - C_{max}^* = \frac{1}{3} C_{max}^*
     \end{align*}
     In \textbf{LPT}-rule, we can assume the last job completed always has the shortest processing time.
-    If it is not the case, we simply discard the shorter jobs, while the new job list still has the same makespan. 
+    If this is not the case, we simply discard the shorter jobs while the new job list still has the same makespan. 
     Thus, for each job $i = 1, \cdots, n$, it holds $p_i \geq p_j > \frac{1}{3}C_{max}^*$. 
-    There are hence at most two jobs on each machine, otherwise the optimal makespan would exceed $C_{max}^*$. 
+    There are, thus, at most two jobs on each machine. Otherwise, the optimal makespan would exceed $C_{max}^*$. 
     We are able to show that \textbf{LPT}-rule yields the optimal solution by case distinction. 
     
     \textbf{Case 1:} There is no job processed before $j$ on the same machine. Since $j$ is the shortest job, 
@@ -260,33 +258,33 @@ As expected it yields a better approximation ratio.
     \textbf{Case 2:} There is a job processed before $j$ on the same machine. Since there are at most two jobs on each 
     machine, we may assume that there are $k + k'$ jobs in total, where $k' \leq k$. 
     Sort the jobs reversely with regard to their processing time. The optimal schedule is assigning $(k + i)$-th job 
-    directly after the $i$-th job, where $i < k'$. If $(k+k')$-th job is assigned after a job finishing later than $k'$-th job, it will 
-    definitely finishes later than the optimal schedule. If it is assigned after a job finishing earlier than $k'$-th job, 
+    directly after the $i$-th job, where $i < k'$. If $(k+k')$-th job is assigned after a job finishes later than the $k'$-th job, it will 
+    definitely finish later than the optimal schedule. If it is assigned after a job finishing earlier than the $k'$-th job, 
     a job that takes longer will be assigned after the $k'$-th job, which is also suboptimal.\\
-    To summarize, the optimal schedule is obtained by the \textbf{LPT}-rule algorithm, which contradicts with the assumption $C_{max} > \dfrac{4}{3} C_{max}^*$.
+    To summarize, the optimal schedule is obtained by the \textbf{LPT}-rule algorithm, which contradicts the assumption $C_{max} > \dfrac{4}{3} C_{max}^*$.
 \end{proof}
 
 \section{k-Center Problem}
-Many graph problems are known to be \NP-hard. Furthermore, greedy algorithms are known to be useful in computing 
-many graph structures in polynomial-time such as minimum spanning trees, shortest paths etc. Unaccidentally, 
-this strategy is also useful in term of approximation algorithms. 
+Many graph problems are known to be \NP-hard. Furthermore, greedy algorithms are known to be helpful in computing 
+many graph structures in polynomial time, such as minimum spanning trees, shortest paths, etc. Unaccidentally, 
+this strategy is also helpful in terms of approximation algorithms. 
 In the following sections, we introduce the approximation for $k$-Center, Travelling Salesman Problem, and Edge Coloring. \\
 $k$-Center is a classical problem in computational geometry. It is also related to well-studied $k$-means clustering in machine learning. 
 The problem is defined as follows.
 \begin{definition}[$k$-Center]
     Given a set of $n$ points $P$ in a metric space with distance function $|\cdot|$. 
-    Find $k$ centers $S \subseteq P$ s.t. the maximal distance from any point to its nearest center is minimized.
+    Find $k$ centers $S \subseteq P$ so that the maximal distance from any point to its nearest center is minimized.
     \begin{align*}
         r = \max_{p \in P} d(p, S)
     \end{align*}
     where $d(p, S) = \min_{s \in S} |s - p| $
 \end{definition}
-The problem can be reduced to a problem in undirected weighted graph, where the weight is the distance between two vertices. 
+The problem can be reduced to a problem in an undirected weighted graph, where the weight is the distance between two vertices. 
 The greedy algorithm for this problem starts with an arbitrary center. In each iteration, we pick the point that 
-is farthest from the current centers, i.e. choosing $\arg \max d(p, S)$ from $p \in P \backslash S$. 
-By adding such point to the center set in $(k-1)$ iterations, we obtain an approximation for $k$-Center .
+is farthest from the current centers, i.e., choosing $\arg \max d(p, S)$ from $p \in P \backslash S$. 
+By adding such a point to the center set in $(k-1)$ iterations, we obtain an approximation for $k$-Center.
 \begin{theorem}
-    The presented greedy problem yields a $2$-approximation ratio for $k$-Center .
+    The presented greedy problem yields a $2$-approximation ratio for $k$-Center.
 \end{theorem}
 \begin{proof}
     Let $r^*$ denote the optimal distance radius. 
@@ -299,8 +297,8 @@ By adding such point to the center set in $(k-1)$ iterations, we obtain an appro
     chooses a center from each cluster, the approximation ratio is guaranteed. For an arbitrary point, if the center from 
     its cluster is its nearest neighbor, the presented bound of $2r^*$ is sufficient. 
     Otherwise, there would be a nearer center, which is also dominated by the bound of $2r^*$.  \\
-    A more interesting case is when not all clusters have a point selected as center. 
-    There would be then at least two points, $p$ and $q$,  from the same cluster. By the presented upperbound, 
+    A more interesting case is when not all clusters have a point selected as a center. 
+    There would be then at least two points, $p$ and $q$,  from the same cluster. By the presented upper bound, 
     we know $|p - q| \leq 2r^*$. In our algorithm, we always choose the point with maximal $d(p, S)$. Hence 
     when both $p$ and $q$ were added into $S$, it holds
     \begin{align*}
@@ -309,12 +307,12 @@ By adding such point to the center set in $(k-1)$ iterations, we obtain an appro
     for an arbitrary $p'$ not in $S$, which justifies the $2$-approximation ratio for points whose cluster has no center selected.
 \end{proof}
 In fact, $\alpha = 2$ is the best possible approximation for $k$-Center , if $\PTIME \neq \NP$. To prove this, 
-we reduce $k$-Center from Dominating Set, which is an \NP-hard decision problem.
+we reduce $k$-Center from Dominating Set, an \NP-hard decision problem.
 \begin{definition}[Dominating Set]
     Given an undirected graph $G = (V, E)$, we need to find a set $S \subseteq V$ of size $k$ s.t. each vertex in $V$ is either in $S$ or adjacent to a vertex in $S$.
 \end{definition}
 \begin{lemma}
-    If there is polynomial-time approximation algorithm for $k$-Center  with $\alpha < 2$, 
+    If there is a polynomial-time approximation algorithm for $k$-Center  with $\alpha < 2$, 
     then there is a polynomial-time algorithm for deciding Dominating Set.
 \end{lemma}
 \begin{proof}
@@ -325,7 +323,7 @@ we reduce $k$-Center from Dominating Set, which is an \NP-hard decision problem.
     \begin{align*}
     r = \lfloor \alpha r^* \rfloor = \lfloor \alpha \rfloor = 1
     \end{align*}
-    Hence the approximation yields the optimal solution for $k$-Center , which results 
+    Hence, the approximation yields the optimal solution for $k$-Center, which results 
     in a polynomial-time algorithm to decide Dominating Set.
 \end{proof}
 Since Dominating Set is \NP-hard, we may conclude that $\alpha = 2$ is the best possible approximation given that $\PTIME = \NP$ is not solved yet. 
@@ -334,12 +332,12 @@ Since Dominating Set is \NP-hard, we may conclude that $\alpha = 2$ is the best 
 \end{theorem}
 
 \section{Traveling Salesman Problem}
-The Traveling Salesman Problem(\textbf{TSP}) is one of the most studied combinatorial optimization problem.
-In this problem, we want to minimize the total cost of the saleperson's tour that visits each city and returns to 
-the initial city. By convention, we assume the cost between two city is non-negative and symmetric.  
+The Traveling Salesman Problem(\textbf{TSP}) is one of the most studied combinatorial optimization problems.
+In this problem, we want to minimize the total cost of the salesperson's tour, which visits each city and returns to 
+the initial city. By convention, we assume the cost between two cities is non-negative and symmetric.  
 \begin{definition}[TSP]
     Give an undirected completed graph $G = (V, E)$ and a cost function $c: E \rightarrow \mathbb{R}^+$, find a path $\pi \in V^*$
-    such that all vertices in $V$ exist exactly once in $\pi$ and its total cost is minimized.
+    such that all vertices in $V$ exist exactly once in $\pi$, and its total cost is minimized.
 \end{definition}
 For a general case of \textbf{TSP}, a polynomial-time approximation exists if and only if $\PTIME = \NP$. This is proven 
 by a reduction from Hamiltonian Cycle to \textbf{TSP}.
@@ -353,16 +351,16 @@ by a reduction from Hamiltonian Cycle to \textbf{TSP}.
 \begin{proof}
     Given an instance of Hamiltonian Cycle $G = (V, E)$, we need to fill in the missing edges such that $G$ becomes 
     a completed graph for \textbf{TSP}. Pick $\alpha > 1$ arbitrarily. 
-    We assign a cost of $1$ to the existing edges, and a cost of $(\alpha - 1) n + 2$ to the missing 
+    We assign a cost of $1$ to the existing edges and a cost of $(\alpha - 1) n + 2$ to the missing 
     edges where $n = |V|$. If there is a Hamiltonian Cycle in $G$, the total cost of the tour is $n$. 
     Otherwise, the total cost of the cycle is at least $\alpha n + 1$. If there exists a polynomial-time $\alpha$-approximation algorithm 
-    for \textbf{TSP}, the cost outputed by this algorithm is at most $\alpha n < \alpha n + 1$. Thus, there exists a 
+    for \textbf{TSP}, the cost output by this algorithm is at most $\alpha n < \alpha n + 1$. Thus, there exists a 
     Hamiltonian Cycle in $G$ if such approximation exists.  
 \end{proof}
 Since a polynomial-time approximation is not possible for general \textbf{TSP}. We may wonder if any constraints 
 can be added to the problem to enable a polynomial-time approximation. If we consider the cost function as the distance between 
 two real cities, an interesting property, the triangular inequality, can be exploited. 
-In fact, the triangular inequality holds for any metric space. Hence we may consider the \textbf{metric TSP} problem.
+In fact, the triangular inequality holds for any metric space. Hence, we may consider the \textbf{metric TSP} problem.
 \begin{definition}[metric TSP]
     Let $G = (V, E)$ and $c: E \rightarrow \mathbb{R}^+$ be an instance of \textbf{TSP}. It is an instance of metric \textbf{TSP} 
     if and only if the triangular inequality holds for all edges in $E$.
@@ -370,7 +368,7 @@ In fact, the triangular inequality holds for any metric space. Hence we may cons
         \forall i, j, k \in V. c(i, j) + c(j, k) \geq c(i, k)
     \end{align*}
 \end{definition} 
-Whle a round trip in metric \textbf{TSP} visits all cities and return to the initial city, a minimum spanning tree(\textbf{MST})
+While a round trip in metric \textbf{TSP} visits all cities and returns to the initial city, a minimum spanning tree(\textbf{MST})
 connects all cities with minimum total cost without forming a cycle. We may wonder if \textbf{MST} can be used for analysis of 
 approximation or simply as a sub-routine in the algorithm. In fact, if we break any edge in the round trip, a spanning tree 
 can be obtained. This spanning tree must have a total cost less than or equal to the cost of the \textbf{MST}. This 
@@ -380,35 +378,35 @@ leads to the following lemma.
     For any metric \textbf{TSP} instance, the cost of the optimal tour is at least the cost of the \textbf{MST} on the same 
     instance.
 \end{lemma}
-From now on, we denote the cost of the \textbf{MST} as $c_{MST}$ and the cost the optimal tour as $c^*$. \cref{lemma:MST} then 
+From now on, we denote the cost of the \textbf{MST} as $c_{MST}$ and the cost of the optimal tour as $c^*$. \cref{lemma:MST} then 
 yields $c_{MST} \leq c^*$. which is useful in the proofs of the next three algorithms. 
 
 \subsection{A Greedy Algorithm}
-The simplest idea of a greedy algorithm for \textbf{TSP} is adding a vertice with the lowest cost until all vertices are visited. 
-This is referred to as the \textit{nearest addition algorithm}. To be more specific, the algorithm starts with a round tour between an arbitary vertice and its 
-nearest neightbor. In each iteration, let $S$ be the set of vistied cities. We pick $v \in S$ and $u \not\in S$ such that 
-$c(u, v)$ is minimized. Let $w$ be the vertex folloing $v$ in the current tour. We discard the edge $(v, w)$ and add $(v, u)$ and $(u, w)$ to the tour.
-The algorithm terminates when all vertices are visited, and hence runs in linear time. 
+The most straightforward idea of a greedy algorithm for \textbf{TSP} is adding a vertice with the lowest cost until all vertices are visited. 
+This is referred to as the \textit{nearest addition algorithm}. To be more specific, the algorithm starts with a round tour between an arbitrary vertice and its 
+nearest neighbor. In each iteration, let $S$ be the set of visited cities. We pick $v \in S$ and $u \not\in S$ such that 
+$c(u, v)$ is minimized. Let $w$ be the vertex following $v$ during the current tour. We discard the edge $(v, w)$ and add $(v, u)$ and $(u, w)$ to the tour.
+The algorithm terminates when all vertices are visited and hence runs in linear time. 
 One may observe that the greedy strategy for \textit{nearest addition algorithm} is similar to that of \textit{Prim's algorithm} for \textbf{MST}.
 Combining this observation and \cref{lemma:MST}, we obtain the following theorem. \color{red} cite prim \color{black}
 \begin{theorem}
     The \textit{nearest addition algorithm} yields a $2$-approximation ratio for metric \textbf{TSP}.
 \end{theorem}
 \begin{proof}
-    Consider the edge $e = (u, v)$ found in each iteration. We claim that $e$ is exactly the same edge found by \textit{Prim's algorithm}.
+    Consider the edge $e = (u, v)$ found in each iteration. We claim that $e$ is precisely the same edge found by \textit{Prim's algorithm}.
     In each step, \textit{Prim's algorithm} also chooses the minimum cost edge $e' = (v', u')$ such that $v' \in S$ and $u' \not\in S$, while 
-    $S$ is the \mst builded step by step. While the sets of edges that we preserve between iterations are different in two algorithms, 
-    the set of vertices $S$ is exactly the same. Hence the edge $e$ is the same as $e'$. 
-    Let $T$ be the set of edges picked in the iterations along with the initial edge. Apparently $T$ is an \mst. The next step is bounding 
-    the cost of round tour with the cost of $T$. \\
-    Conisder the cost change in each iteration. While $(u, v)$ and $(v, w)$ are added to the tour, $(u, w)$ is removed. The cost change is $c(u, v) + c(v, w) - c(u, w)$.
+    $S$ is the \mst built step by step. While the sets of edges that we preserve between iterations are different in the two algorithms, 
+    the set of vertices $S$ is exactly the same. Hence, the edge $e$ is the same as $e'$. 
+    Let $T$ be the set of edges picked in the iterations along with the initial edge. Apparently, $T$ is an \mst. The next step is bounding 
+    the cost of a round tour with the cost of $T$. \\
+    Consider the cost change in each iteration. While $(u, v)$ and $(v, w)$ are added to the tour, $(u, w)$ is removed. The cost change is $c(u, v) + c(v, w) - c(u, w)$.
     Using the triangular inequality, we have $c(u, v) + c(u, w) \geq c(v, w)$. Combining both, we obtain 
     \begin{align*}
         c(u, v) + c(v, w) - c(u, w) \leq 2c(u, v)
     \end{align*}
-    Recall that the initial cost of the tour in \textit{nearest addition algorithm} is $2c(e_0)$ where $e_0$ is the initial edge, because we started 
+    Recall that the initial cost of the tour in \textit{nearest addition algorithm} is $2c(e_0)$ where $e_0$ is the initial edge because we started 
     with a round tour between two vertices. Since each $(u, v)$ chosen in the iteration is distinct, the total cost of the tour is bounded by 
-    the twice of the cost of $T$. Applying \cref{lemma:MST}, we have
+    twice of the cost of $T$. Applying \cref{lemma:MST}, we have
     \begin{align*}
         c \leq 2 c_{MST} \leq 2 c^*
     \end{align*}
@@ -416,17 +414,17 @@ Combining this observation and \cref{lemma:MST}, we obtain the following theorem
 \end{proof}
 
 \subsection{A Little Help from Euler}
-While Hamiltonian Cycle is \NP-hard, deciding if there is a path that traverse each edge exactly once 
-is solvable in polynomial time. This is known as Eulerian Path. Thanks to Euler's efforts 
-in brdiges of K\"onigsberg, we know that a graph has an Eulerian Path if all vertices have even degree. \\
+While Hamiltonian Cycle is \NP-hard, deciding if there is a path that traverses each edge exactly once 
+is solvable in polynomial time. This is known as the Eulerian Path. Thanks to Euler's efforts 
+in bridges of K\"onigsberg, we know that a graph has an Eulerian Path if all vertices have an even degree. \\
 Here comes an even simpler greedy algorithm: compute the \mst, create a copy of each 
-edge and add those copies back to the \mst. The resulting graph has a Eulerian Path. Find a Eulerian Path 
+edge, and add those copies back to the \mst. The resulting graph has an Eulerian Path. Find a Eulerian Path 
 \begin{align*}
     \pi = (v_1, v_2)\cdots(v_i, v_{i+1})\cdots(v_{n-1}, v_n)    
 \end{align*}
 We now have a tour visiting each vertex, but we still have 
-to remove all the repeated vertices. This is also simple: remove all repeated existence of vertices in $\pi$, 
-connect the gap between two vertices with the edge from the original graph. In fact, this is just the same as 
+to remove all the repeated vertices. This is also simple: remove all repeated existence of vertices in $\pi$ 
+and connect the gap between two vertices with the edge from the original graph. In fact, this is just the same as 
 the \textit{nearest addition algorithm} with a manner of analysis. Thus, this \textit{double-tree algorithm}
 has exactly the same approximation ratio. 
 \begin{theorem}
@@ -434,56 +432,56 @@ has exactly the same approximation ratio.
     \label{theorem:double-tree}   
 \end{theorem}
 \begin{proof}
-    The Eulerian Path over the \mst\ has the cost of $2c_{MST}$, which is already a nice upperbound. 
+    The Eulerian Path over the \mst\ has the cost of $2c_{MST}$, which is already a nice upper bound. 
     It suffices to show that the modification on the Eulerian Path does not increase the cost. \\
-    Let $v_i$ and $v_j$ be two vertices in the Eulerian Path. Furthermore, they have their first existence at $i$-th and $j$-th position respectively.
-    Suppose all vertices between them have existed ealier than $v_i$. We have to remove the edges $(v_i, v_{i+1}), \cdots, (v_{j-1}, v_j)$, 
+    Let $v_i$ and $v_j$ be two vertices in the Eulerian Path. Furthermore, they have their first existence at $i$-th and $j$-th position, respectively.
+    Suppose all vertices between them have existed earlier than $v_i$. We have to remove the edges $(v_i, v_{i+1}), \cdots, (v_{j-1}, v_j)$, 
     and insert a new edge $(v_i, v_j)$ into the path. The cost change would be 
     \begin{align*}
         c_i = c(v_i, v_j) - \sum_{k = i}^{j-1} c(v_k, v_{k+1})
     \end{align*}
     By applying triangular inequality repeatedly, we are able to show $c_i \leq 0$ \color{red} visualization if needed \color{black}. 
-    This simply means that the modification in each step does not increase the cost. Hence the 2-approximation ratio is justified.
+    This simply means that the modification in each step does not increase the cost. Hence, the 2-approximation ratio is justified.
 \end{proof}
 
 \subsection{A Little More Help from Christofides}
-Copying the edges of the \mst\ is a simple idea, but it is not the best idea. Is there other way to 
-construct a Eulerian Path with less cost? The answer is yes. Christofides proposed a $\frac{3}{2}$-approximation 
+Copying the edges of the \mst\ is a simple idea, but it is not the best idea. Is there another way to 
+construct an Eulerian Path with less cost? The answer is yes. Christofides proposed a $\frac{3}{2}$-approximation 
 taking advantage of Perfect Matching.
 \begin{definition}[Perfect Matching]
-    Given a graph $G = (V, E)$. A matching is a set edges such that no two edges share a common vertex.
+    Given a graph $G = (V, E)$. A matching is a set of edges such that no two edges share a common vertex.
     A matching is perfect if and only if each vertex in $V$ is incident to exactly one edge in the matching.
 \end{definition}
-How do we take advantage of Perfect Matching? We would like to return to the existence of Eulerian Path. 
-For any tree, there exists no Eulerian Path, for leaves can only have odd degree. However, if we connect 
-them with edges from perfect matching, the degree of each vertex becomes even. This not only applies to 
-leaves, but also internal nodes with odd degree. Let $O$ be the set of vertices with odd degree in the \mst.
-We still need to prove that there exists a perfect matching. 
+How do we take advantage of Perfect Matching? We would like to return to the existence of the Eulerian Path. 
+For any tree, there exists no Eulerian Path, for leaves can only have an odd degree. However, if we connect 
+them with edges from perfect matching, the degree of each vertex becomes even. This applies not only to 
+leaves but also to internal nodes with odd degrees. Let $O$ be the set of vertices with odd degree in the \mst.
+We still need to prove that a perfect match exists. 
 \begin{lemma}
     \label{lemma:odd}
-    For any tree $T$, the number of vertices with odd degree is even.
+    For any tree $T$, the number of vertices with odd degrees is even.
 \end{lemma}
 \begin{proof}
     In any graph, we have $|E| = 2|V|$ and $\sum_{v \in V} \deg(v) = 2|E|$. Observe that the sum of even numbers 
-    is always even. Hence the total degree of vertices with even degree is even. We denote this value with $2k$.
-    It follows that the total degree of vertices with odd degree is also even.
+    is always even. Hence, the total degree of vertices with an even degree is even. We denote this value with $2k$.
+    It follows that the total degree of vertices with odd degrees is also even.
     \begin{align*}
         \sum_{v \in O} \deg(v) = \sum_{v \in V} \deg(v) - \sum_{v \in V \backslash O} \deg(v) = 2|E| - 2k = 2(|E| - k)
     \end{align*}
     Since the sum of odd numbers is even if and only if the number of odd numbers is even, the lemma is proven.
 \end{proof}
-\cref{lemma:odd} shows that $|O|$ is even. In addition, we have a complete graph in \tsp. Thus, there exists 
-a perfect matching in $O$. We add the edges of the perfect matching to the \mst, obtaining a graph with a 
+\cref{lemma:odd} shows that $|O|$ is even. In addition, we have a complete graph in \tsp. Thus,  
+a perfect matching exists for $O$. We add the edges of the perfect matching to the \mst, obtaining a graph with a 
 Eulerian Path. The rest of the work is the same as the \textit{double-tree algorithm}. 
 It can be inferred that the modification on the Eulerian Path does not increase the cost as in the proof of 
-\cref{theorem:double-tree}. The approximatin ratio for \textit{Christofides' algorithm} is dependent on the size 
+\cref{theorem:double-tree}. The approximation ratio for \textit{Christofides' algorithm} is dependent on the size 
 of the Perfect Matching.
 \begin{theorem}
     Christofides' algorithm yields a $\frac{3}{2}$-approximation ratio for metric \textbf{TSP}.
 \end{theorem}
 \begin{proof}
     We construct a tour on vertices from $O$. This can be constructed from the optimal tour. 
-    Let $v$ and $u$ be two vertices from $O$ between which there is only vertices not from $O$. 
+    Let $v$ and $u$ be two vertices from $O$, between which there are only vertices not from $O$. 
     Using the same idea as in \cref{theorem:double-tree}, we discard those intermediate vertices and 
     insert a new edge $(v, u)$. The cost never increases. Let $c_O$ denote the cost of this tour, 
     it holds 
@@ -491,14 +489,14 @@ of the Perfect Matching.
         c_O \leq c^*
     \end{align*}
     Since the number of vertices is even, the number of edges in this tour is also even. We can then 
-    construct two Perfect Matchings by coloring: pick an arbitrary edge with color $1$, and 
+    construct two Perfect Matchings by coloring: pick an arbitrary edge with color $1$ and 
     color its neighbor with color $2$. Repeat the procedure until all edges are colored. 
     We always pick the smaller one for \textit{Christofides' algorithm}.
     Let $c_1$ and $c_2$ be the cost of the two Perfect Matchings. It follows 
     \begin{align*}
         \min(c_1, c_2) \leq \dfrac{2 \cdot \min(c_1, c_2)}{2} \leq \dfrac{c_1 + c_2}{2} \leq \dfrac{c_O}{2} \leq \dfrac{c^*}{2}
     \end{align*}
-    Hence the size of the Eulerian Path in \textit{Christofides' algorithm} is bounded by 
+    Hence, the size of the Eulerian Path in \textit{Christofides' algorithm} is bounded by 
     \begin{align*}
         c_{\text{Christofides}} = c_{MST} + \min(c_1, c_2) \leq \dfrac{3}{2} c^*
     \end{align*}
@@ -507,11 +505,11 @@ of the Perfect Matching.
 
 \section{Conclusion}
 In this paper, we studied the techniques of local search and greedy algorithms in 
-the context of approximation algorithms. We explored two topics, scheduling and graph problems. 
-For all studied problems, a nice constant approximation ratio is obtained. There are also 
-other techniques in approximation such as linear programming, randomization, and primal-dual method etc.
-We also noticed that there is a limit for the approximation ratio for some problems. 
-This leaves people with space and imagination to explore larger questions of \NP-completeness and other complexity classes such as \textbf{APX}. 
+the context of approximation algorithms. We explored two topics: scheduling and graph problems. 
+For all studied problems, an excellent constant approximation ratio is obtained. There are also 
+other techniques in approximation, such as linear programming, randomization, and the primal-dual method.
+We also noticed that there is a limit to the approximation ratio for some problems. 
+This leaves people with space and imagination to explore more significant questions of \NP-completeness and other complexity classes such as \textbf{APX}. 
 
 \begin{thebibliography}{10}
 \setlength{\itemsep}{0pt plus .3pt}
