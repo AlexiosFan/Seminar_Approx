@@ -1,0 +1,121 @@
+\documentclass{beamer}
+
+\usepackage{xcolor}
+
+\newcommand*{\brk}{\\[10pt]}
+\newcommand*{\doublebrk}{\\[10pt]}
+
+\title{Approximation: Greedy and Local Search}
+
+\author{Zixuan Fan}
+\institute{Technische Universität München}
+
+\date{July 2024}
+
+\begin{document}
+\begin{frame}
+    \titlepage   
+\end{frame}
+
+\begin{frame}
+    \frametitle{Agenda}
+    \begin{enumerate}
+        \item Introduction
+        \item Scheduling Problems
+            \begin{itemize}
+                \item Scheduling on Single Machines
+                \item Scheduling on Multiple Machines 
+            \end{itemize}
+        \item Graph Problems 
+            \begin{itemize}
+                \item K-center Problem 
+                \item Travelling Salesman Problem
+            \end{itemize}
+        \item Conclusion
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Purpose of Approximation}
+    \begin{itemize}
+        \item<1-> Some problems not efficiently solvable: NP-hardness
+        \item<2-> Can we find a flawed solution?
+        \item<3-> How flawed/good is this solution?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Quick Recap: Approximation Ratio}
+    $Opt^*$: the optimal solution \\ 
+    $Opt$: the suboptimal solution we compute \\[10pt]
+    For minimization problem, we have
+    \begin{align*}
+        \alpha = \dfrac{|Opt|}{|Opt^*|}
+    \end{align*}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Techniques in Approximation}
+    \begin{enumerate}
+        \item<1-> Randomization: MAXSAT
+        \item<2-> Dynamic Programming: Knapsack, Bin Packing
+        \item<3-> Linear \& Integer Programming: Primal-Dual, Semidefinite Program 
+        \item<4-> \color{red} Greedy \& Local Search \color{black}
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Greedy and Local Search}
+    \begin{itemize}
+        \item<1-> Both strategies attempt to make the best decision
+        \item<2-> Greedy algorithms forms a solution step by step 
+        \item<3-> Local Search starts search from an arbitrary solution
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{K-Center Problem}
+    \textbf{Problem Statement:} Given $n$ points in a space, 
+    choose $k$ centers from them such that the sum of distances between 
+    each point and its nearest neighbor is minimized. 
+\end{frame}
+
+\begin{frame}{K-Center Problem - Formal Definition}
+    $d(p, q)$: distance between $p, q$ \\ 
+    $d(p, S) := \min_{q \in S} d(p, q)$ \\
+    \textbf{Input:} $S, k$ \\
+    \textbf{Output:} $C \subseteq S$ s.t. $|C| = k$ and  $\sum_{p \in S} d(p, S)$ 
+    is minimized \\[20pt]
+    \pause 
+    \textbf{What is the distance function? \\ Or what property does the distance function have?}
+\end{frame}
+
+\begin{frame}{Algorithm - Intuition}
+    How do we search \textbf{greedily}? \\[10pt]
+    If we have a temporary center $|C| < k$, how to build $|C'| = |C| + 1$?
+\end{frame}
+
+\begin{frame}{Algorithm - Description}
+    Find $v \in S \backslash C$ s.t. $d(v, C)$ is maximized. \brk
+    $C' = C \cup \{v\}$ \brk
+    \pause
+    What is the cost per iteration? \pause $O(|S| \cdot |S \backslash V|) = O(n^2)$
+\end{frame}
+
+\begin{frame}{Algorithm - Description}
+    But, what is $C$ at the beginning of the iteration? 
+    \pause 
+    \begin{enumerate}
+        \item The center of all points? $\implies$ Needs another $O(n^2)$ cost 
+        \item Any arbitrary point $\implies$ Constant cost
+    \end{enumerate}
+    \pause
+    Is the $O(n^2)$ cost worth it? We will discuss it later.
+\end{frame}
+
+\begin{frame}{Analysis}
+    \textbf{Quadratic} cost
+    \pause\brk
+    \textbf{Approximation ratio}
+\end{frame}
+
+\end{document}
