@@ -23,7 +23,7 @@
         \item Introduction
         \item Scheduling Problems
             \begin{itemize}
-                \item Scheduling on Single Machines
+                \item Scheduling with deadlines on a Single machine
                 \item Scheduling on Multiple Machines 
             \end{itemize}
         \item Graph Problems 
@@ -49,16 +49,20 @@
     \frametitle{Quick Recap: Approximation Ratio}
     $Opt^*$: the optimal solution \\ 
     $Opt$: the suboptimal solution we compute \\[10pt]
-    For minimization problem, we have
+    For minimization problems, we have
     \begin{align*}
-        \alpha = \dfrac{|Opt|}{|Opt^*|}
+        \alpha = \dfrac{|Opt|}{|Opt^*|} > 1
+    \end{align*}
+    And for maximization problems
+    \begin{align*}
+        \alpha = \dfrac{|Opt|}{|Opt^*|} < 1
     \end{align*}
 \end{frame}
 
 \begin{frame}
     \frametitle{Techniques in Approximation}
     \begin{enumerate}
-        \item<1-> Randomization: MAXSAT
+        \item<1-> Randomization: MAXSAT, MAXCUT
         \item<2-> Dynamic Programming: Knapsack, Bin Packing
         \item<3-> Linear \& Integer Programming: Primal-Dual, Semidefinite Program 
         \item<4-> \color{red} Greedy \& Local Search \color{black}
@@ -72,6 +76,108 @@
         \item<3-> Local Search starts search from an arbitrary solution
     \end{itemize}
 \end{frame}
+
+
+\begin{frame}{Scheduling with deadlines on a Single machine}
+    \textbf{Problem Statement: } Given $n$ jobs to be processed on a single machine. 
+    How can we schedule them such that they will finish as early as possible. \brk 
+    \begin{itemize}
+        \item What if there is not deadline?
+        \item How do we define earlieness/lateness?
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Scheduling with deadlines on a Single machine - Formal Definition}
+Suppose job $j$ is finished at time $C_j$, the lateness is 
+\begin{align*}
+    L_j := C_j - d_j 
+\end{align*}
+The lateness of all jobs is 
+\begin{align*}
+    L_{max} = \max_{i \in [n]} L_i
+\end{align*}
+\textbf{Input:} $n$ jobs with release time $r_j$, processing time $p_j$, and deadline $d_j$. \brk 
+\textbf{Output:} a schedule such that $L_{max}$ is minimized.
+\end{frame}
+
+\begin{frame}{Algorithm - Intuition}
+    If the job $j$ is finished before the deadline we don't get penalty for it, so \dots 
+    \begin{enumerate}
+        \item<1-> What if we always choose the job with the earliest deadlines 
+        \item<2-> But, we may have deal with negative values. 
+        \item<3> So all deadlines are negative (by assumption).
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Algorithm - Analysis}
+    We start with an observation. 
+    Let $S$ be a set of jobs,
+    \begin{itemize}
+        \item $r(S) := \min_{j \in S} r_j$ 
+        \item $p(S) := \sum_{j \in S} p_j$ 
+        \item $d(S) := \max_{j \in S} d_j$
+    \end{itemize}
+    We claim that
+    \begin{align*}
+        L_{max}^* \geq r(S) + p(S) - d(S)
+    \end{align*}
+    This is proven by considering the optimal schedule.
+\end{frame}
+
+\begin{frame}{Algorithm - Analysis}
+    \begin{align*}
+        L_{max}^* \geq r(S) + p(S) - d(S)
+    \end{align*}
+    This leads directly to 
+    \begin{align*}
+        L_{max}^* \geq r({j}) + p({j}) - d({j}) \geq -d_j
+    \end{align*}
+    where $j$ is the job that leads to the maximal lateness. 
+\end{frame}
+
+\begin{frame}{Algorithm - Analysis}
+    \begin{align*}
+        L_{max}^* \geq -d_j
+    \end{align*}
+    Recall $L_{max} = C_j - d_j$, it suffices to show
+    \begin{align*}
+        L_{max}^* \geq C_j
+    \end{align*}
+\end{frame}
+
+\begin{frame}{Algorithm - Analysis}
+    We start with an ideal scenario: all jobs are released at time $t = 0$. We have 
+    \begin{itemize}
+        \item $r(S) = 0$ 
+        \item $p(S) = C_j$ 
+        \item $d(S) < 0$, by assumption
+    \end{itemize}
+    From lemma it follows that 
+    \begin{align*}
+        L_{max}^* \geq r(S) + p(S) - d(S) \geq p(S) = C_j
+    \end{align*}
+    \pause
+    \color{red} How about the general cases? \color{black}
+\end{frame}
+
+\begin{frame}{Algorithm - Analysis}
+    \color{red} How about the general cases? \color{black} 
+    \begin{itemize}
+        \item<1-> We consider it in a way of calculus
+        \item<2-> Find the time $t$ such that $[t, C_j]$ has no idle time 
+        \item<3-> Denote jobs processed in this interval with $S$.
+        \item<4-> $r(S) = t$, $p(S) = C_j - t$ 
+        \item<5> Thus $C_j = r(S) + p(S) \leq L_{max}^*$ 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Algorithm - Analysis} 
+    Summarizing two results $L_{max}^* \geq -d_j$ and $L_{max}^* \geq C_j$, we obtain
+    \begin{align*}
+        L_{max} = C_j - d_j \leq 2L_{max}^*
+    \end{align*}
+\end{frame} 
 
 \begin{frame}
     \frametitle{K-Center Problem}
@@ -164,12 +270,12 @@
         \item<2-3> If there was $\implies$ Hamilton-Cycle solvable in P!
         \item<3> But: metric distance can help us!
     \end{enumerate}
+    \pause 
+    Suppose for each vertice $u, v, w \in V$, triangular inequality holds
+    \begin{align*}
+        d(u, v) + d(v, w) \geq d(u, w)
+    \end{align*}
 \end{frame}
-\pause 
-Suppose for each vertice $u, v, w \in V$, triangular inequality holds
-\begin{align*}
-    d(u, v) + d(v, w) \geq d(u, w)
-\end{align*}
 
 \begin{frame}{Algorithm - A bit help from Euler}
     \begin{itemize}
@@ -188,18 +294,36 @@ Suppose for each vertice $u, v, w \in V$, triangular inequality holds
         \item $w_{MST} \leq w_{Opt^*}$: Round tour contains trees!
         \item $w_G \leq 2w{MST}$: triangular inequality
     \end{enumerate}
+    $\implies w_G \leq 2w_{Opt^*}$ 
 \end{frame}
 
 \begin{frame}{Algorithm - A bit help from Christofide}
 \begin{itemize}
-    \item We can do the same trick to all Eulerian Graphs
-    \item As long as it connects all vertices 
-    \item How to make MST Eulerian?
+    \item<1-> We can do the same trick to all Eulerian Graphs
+    \item<2-> As long as it connects all vertices 
+    \item<3-> How to make MST Eulerian?
+    \item<4-> Make all vertices have \textbf{even} degrees
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Algorithm - A bit help from Christofide}
-    Perfect Matching
+    \textbf{HOW?}
+    \begin{enumerate}
+        \item<1-> Connect all vertices with odd degrees
+        \item<2-> How many vertices with odd degrees?
+        \item<3-> Finding a perfect matching
+        \item<4-> What is the cost? What is the size of the PM?
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Algorithm - A bit help from Christofide}
+    For the size of the tour:
+    \begin{enumerate}
+        \item $w_{MST} \leq w_{Opt^*}$: see 1st part
+        \item $w_{PM} \leq \dfrac{1}{2} w_{Opt^*}$:
+        \item $w_{G} \leq w_{MST} + w{PM}$: traingular inequality
+    \end{enumerate}
+    $\implies w_{G} \leq \dfrac{3}{2} w_{Opt^*}$
 \end{frame}
 
 \begin{frame}{Limit of Approximation(Again)}
