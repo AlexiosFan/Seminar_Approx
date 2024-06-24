@@ -1,6 +1,9 @@
 \documentclass{beamer}
 
 \usepackage{xcolor}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{marvosym}
 
 \newcommand*{\brk}{\\[10pt]}
 \newcommand*{\doublebrk}{\\[10pt]}
@@ -179,6 +182,104 @@ The lateness of all jobs is
     \end{align*}
 \end{frame} 
 
+\begin{frame}{Scheduling on Identical Paralle Machines}
+    \textbf{Problem Statement: } Given $n$ jobs to be processed on $k$ 
+    machines, How can we schedule them such that they will finish as early as possible. \brk 
+    \begin{itemize}
+        \item What if there is not deadline?
+        \item How do we define earlieness/lateness?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Scheduling on Identical Paralle Machines - Formal Definition}
+    More machines $\implies$ more complexity \brk 
+    So the problem is \textbf{NP-hard} even if \brk 
+    \ \ \ \ we don't consider \color{red} release time \color{black} and \color{red} deadlines \color{black}
+\end{frame}
+
+\begin{frame}{Scheduling on Identical Paralle Machines - Formal Definition}
+    \textbf{Input:} $n$ jobs with processing time $p_j$ and $k$ machines \brk 
+    \textbf{Output:} A schedule that minimizes 
+    \begin{align*}
+        \max_{j \in [n]} C_j 
+    \end{align*}
+    where $C_j$ is the completion time of job $j$.
+\end{frame}
+
+\begin{frame}{Algorithm - Local Search}
+    \textbf{Recap:} Local search 
+    \begin{itemize}
+        \item<1-3> starts with a valid solution 
+        \item<2-3> searches greedily until 
+        \item<3> no better strategy can be made 
+        \item<4> How do we find a valid solution?
+        \item<4> How to make greedy strategy?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Algorithm - Local Search}
+    \textbf{Recap:} Local search 
+    \begin{itemize}
+        \item<1-> How do we find a valid solution?
+        \item<2-> \color{red} Finish all jobs in one machine. \color{black}
+        \item<1-> How to make greedy strategy?
+        \item<3-> \color{red} Separate those jobs to other machines. \color{black}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Local Search - Seperation of Jobs}
+    \begin{itemize}
+        \item Pick the last job $j$ at the machine $M$ with the latest running time
+        \item Let $t$ be the processing time of all other jobs on $M$
+        \item Find another machine $M'$ such that $t' < t$ is minimized
+        \item Add $j$ to $M'$
+    \end{itemize}
+    \pause 
+    But, can we go into \color{red} LOOPs \color{black}?
+\end{frame}
+
+\begin{frame}{Local Search - Analysis}
+    We show that a job is only assigned \textbf{once} in our local search algorithm. \brk 
+    \textbf{Suppose} that a job $j$ on machine $M$ is assigned for a \textbf{second} time. \brk \pause
+    $\implies$ machine $M$ has the latest running time \brk \pause
+    $\implies$ there is another machine $M'$ such that $t' < t$ \brk \pause 
+    \textbf{BUT}: by our strategy $t$ has to be minimal when $j$ was assigned at an earlier step. \brk \pause 
+    \ \ \ \ We denote completion time on $M'$ at this step as $t'_0$, it holds 
+    \begin{align*}
+        t' \geq t'_0 \geq t \ \mbox{\Lightning}
+    \end{align*}  
+\end{frame}
+
+\begin{frame}{Local Search - Analysis}
+    What about the approximation ratio? \brk \pause 
+    \begin{itemize}
+        \item Completion time on each machine should be close to mean: $$\dfrac{\sum_{j \in [n]}p_j}{n}$$
+        \item It's also the case for the optimal solution, and $$|Opt^*| \geq \dfrac{\sum_{j \in [n]}p_j}{k}$$
+        \item We show $$|Opt| \leq \dfrac{2\sum_{j \in [n]}p_j}{k} \leq 2|Opt^*|$$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Local Search - Analysis}
+    We show $$|Opt| \leq \dfrac{2\sum_{j \in [n]}p_j}{k}$$ 
+    \begin{itemize}
+        \item Consider the machine $M$ with the longest completion time 
+        \item Job $j$ that completes last with processing time $p_j$ 
+        \item All other jobs completes at $t$.
+    \end{itemize}
+    We have $$|Opt| = t + p_j$$ and we may witness 
+    \begin{align*}
+        t &\leq  \dfrac{\sum_{j \in [n]}p_j}{k} \\ 
+        p_j &\leq  \dfrac{\sum_{j \in [n]}p_j}{k}
+    \end{align*}
+\end{frame}
+
+\begin{frame}{Algorithm - Greedy and More}
+    \begin{itemize}
+        \item There exists greedy algorithm that solves problem with $\alpha = 2, \dfrac{4}{3}$
+        \item With rounding and DP, the problem can be approximated with $\alpha = 1 +\epsilon$ for any $\epsilon > 0$
+    \end{itemize}
+\end{frame}
+
 \begin{frame}
     \frametitle{K-Center Problem}
     \textbf{Problem Statement:} Given $n$ points in a space, 
@@ -196,12 +297,12 @@ The lateness of all jobs is
     \textbf{What is the distance function? \\ Or what property does the distance function have?}
 \end{frame}
 
+% present an example (from book?)
+
 \begin{frame}{Algorithm - Intuition}
     How do we search \textbf{greedily}? \\[10pt]
     If we have a temporary center $|C| < k$, how to build $|C'| = |C| + 1$?
 \end{frame}
-
-% present an example (from book?)
 
 \begin{frame}{Algorithm - Description}
     Find $v \in S \backslash C$ s.t. $d(v, C)$ is maximized. \brk
