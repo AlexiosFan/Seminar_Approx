@@ -75,7 +75,7 @@
 \begin{frame}{Greedy and Local Search}
     \begin{itemize}
         \item<1-> Both strategies attempt to make the best decision
-        \item<2-> Greedy algorithms forms a solution step by step 
+        \item<2-> Greedy algorithms form a solution step by step 
         \item<3-> Local Search starts search from an arbitrary solution
     \end{itemize}
 \end{frame}
@@ -85,37 +85,42 @@
     \textbf{Problem Statement: } Given $n$ jobs to be processed on a single machine. 
     How can we schedule them such that they will finish as early as possible. \brk 
     \begin{itemize}
-        \item What if there is not deadline?
-        \item How do we define earlieness/lateness?
+        \item<1-> Suppose $d_j < 0$ to reduce complexity
+        \item<2-> How do we define earlieness/lateness?
+        \item<3-> Suppose job $j$ is finished at time $C_j$, the lateness is 
+        \begin{align*}
+            L_j := C_j - d_j 
+        \end{align*}
+        The lateness of all jobs is 
+        \begin{align*}
+            L_{max} = \max_{i \in [n]} L_i
+        \end{align*} 
     \end{itemize}
 \end{frame}
 
 
 \begin{frame}{Scheduling with deadlines on a Single machine - Formal Definition}
-Suppose job $j$ is finished at time $C_j$, the lateness is 
-\begin{align*}
-    L_j := C_j - d_j 
-\end{align*}
-The lateness of all jobs is 
-\begin{align*}
-    L_{max} = \max_{i \in [n]} L_i
-\end{align*}
-\textbf{Input:} $n$ jobs with release time $r_j$, processing time $p_j$, and deadline $d_j$. \brk 
+
+\textbf{Input:} $n$ jobs with release time $r_j$, processing time $p_j$, and deadline $d_j < 0$. \brk 
 \textbf{Output:} a schedule such that $L_{max}$ is minimized.
 \end{frame}
 
 \begin{frame}{Algorithm - Intuition}
-    If the job $j$ is finished before the deadline we don't get penalty for it, so \dots 
-    \begin{enumerate}
-        \item<1-> What if we always choose the job with the earliest deadlines 
-        \item<2-> But, we may have deal with negative values. 
-        \item<3> So all deadlines are negative (by assumption).
-    \end{enumerate}
+    If the job $j$ is finished before the deadline we don't get penalty for it, so \brk 
+    What if we always choose the job with the earliest deadlines? \brk 
+    \textbf{Earliest Deadline Rule}
+\end{frame}
+
+\begin{frame}{Algorithm - Analysis}
+    Recall $L_{max} = C_j - d_j$ for some $j$ , it suffices to show
+    \begin{align*}
+        c_1L_{max}^* \geq C_j,  c_2L_{max}^* \geq -d_j
+    \end{align*}
 \end{frame}
 
 \begin{frame}{Algorithm - Analysis}
     We start with an observation. 
-    Let $S$ be a set of jobs,
+    Let $S$ be a subset of jobs,
     \begin{itemize}
         \item $r(S) := \min_{j \in S} r_j$ 
         \item $p(S) := \sum_{j \in S} p_j$ 
@@ -125,7 +130,7 @@ The lateness of all jobs is
     \begin{align*}
         L_{max}^* \geq r(S) + p(S) - d(S)
     \end{align*}
-    This is proven by considering the optimal schedule.
+    By considering the optimal schedule.
 \end{frame}
 
 \begin{frame}{Algorithm - Analysis}
@@ -134,41 +139,17 @@ The lateness of all jobs is
     \end{align*}
     This leads directly to 
     \begin{align*}
-        L_{max}^* \geq r({j}) + p({j}) - d({j}) \geq -d_j
+        L_{max}^* \geq r(\{j\}) + p(\{j\}) - d(\{j\}) \geq -d_j
     \end{align*}
     where $j$ is the job that leads to the maximal lateness. 
 \end{frame}
 
-\begin{frame}{Algorithm - Analysis}
-    \begin{align*}
-        L_{max}^* \geq -d_j
-    \end{align*}
-    Recall $L_{max} = C_j - d_j$, it suffices to show
-    \begin{align*}
-        L_{max}^* \geq C_j
-    \end{align*}
-\end{frame}
 
 \begin{frame}{Algorithm - Analysis}
-    We start with an ideal scenario: all jobs are released at time $t = 0$. We have 
-    \begin{itemize}
-        \item $r(S) = 0$ 
-        \item $p(S) = C_j$ 
-        \item $d(S) < 0$, by assumption
-    \end{itemize}
-    From lemma it follows that 
-    \begin{align*}
-        L_{max}^* \geq r(S) + p(S) - d(S) \geq p(S) = C_j
-    \end{align*}
-    \pause
-    \color{red} How about the general cases? \color{black}
-\end{frame}
-
-\begin{frame}{Algorithm - Analysis}
-    \color{red} How about the general cases? \color{black} 
+    \color{red} How about $L_{max}^* \geq C_j$ \color{black} 
     \begin{itemize}
         \item<1-> We consider it in a way of calculus
-        \item<2-> Find the time $t$ such that $[t, C_j]$ has no idle time 
+        \item<2-> Find the earliest time $t$ such that $[t, C_j]$ has no idle time 
         \item<3-> Denote jobs processed in this interval with $S$.
         \item<4-> $r(S) = t$, $p(S) = C_j - t$ 
         \item<5> Thus $C_j = r(S) + p(S) \leq L_{max}^*$ 
@@ -240,41 +221,19 @@ The lateness of all jobs is
 
 \begin{frame}{Local Search - Analysis}
     We show that a job is only assigned \textbf{once} in our local search algorithm. \brk 
-    \textbf{Suppose} that a job $j$ on machine $M$ is assigned for a \textbf{second} time. \brk \pause
-    $\implies$ machine $M$ has the latest running time \brk \pause
-    $\implies$ there is another machine $M'$ such that $t' < t$ \brk \pause 
-    \textbf{BUT}: by our strategy $t$ has to be minimal when $j$ was assigned at an earlier step. \brk \pause 
+    \textbf{Suppose} that a job $j$ on machine $M \not= M_1$ is assigned to another machine $M'$. \brk \pause
+    $\implies$ machine $M$ has the latest running time now \brk \pause
+    $\implies$ on $M'$ it holds $t' < t$ \brk \pause 
+    \textbf{BUT}: by our strategy $t$ has to be minimal when $j$ was assigned to $M$ at an earlier step. \brk \pause 
     \ \ \ \ We denote completion time on $M'$ at this step as $t'_0$, it holds 
     \begin{align*}
         t' \geq t'_0 \geq t \ \mbox{\Lightning}
     \end{align*}  
 \end{frame}
 
-\begin{frame}{Local Search - Analysis}
-    What about the approximation ratio? \brk \pause 
-    \begin{itemize}
-        \item Completion time on each machine should be close to mean: $$\dfrac{\sum_{j \in [n]}p_j}{n}$$
-        \item It's also the case for the optimal solution, and $$|Opt^*| \geq \dfrac{\sum_{j \in [n]}p_j}{k}$$
-        \item We show $$|Opt| \leq \dfrac{2\sum_{j \in [n]}p_j}{k} \leq 2|Opt^*|$$
-    \end{itemize}
-\end{frame}
-
-\begin{frame}{Local Search - Analysis}
-    We show $$|Opt| \leq \dfrac{2\sum_{j \in [n]}p_j}{k}$$ 
-    \begin{itemize}
-        \item Consider the machine $M$ with the longest completion time 
-        \item Job $j$ that completes last with processing time $p_j$ 
-        \item All other jobs completes at $t$.
-    \end{itemize}
-    We have $$|Opt| = t + p_j$$ and we may witness 
-    \begin{align*}
-        t &\leq  \dfrac{\sum_{j \in [n]}p_j}{k} \\ 
-        p_j &\leq  \dfrac{\sum_{j \in [n]}p_j}{k}
-    \end{align*}
-\end{frame}
-
 \begin{frame}{Algorithm - Greedy and More}
     \begin{itemize}
+        \item This is a 2-approximation. 
         \item There exists greedy algorithm that solves problem with $\alpha = 2, \dfrac{4}{3}$
         \item With rounding and DP, the problem can be approximated with $\alpha = 1 +\epsilon$ for any $\epsilon > 0$
     \end{itemize}
@@ -283,18 +242,18 @@ The lateness of all jobs is
 \begin{frame}
     \frametitle{K-Center Problem}
     \textbf{Problem Statement:} Given $n$ points in a space, 
-    choose $k$ centers from them such that the sum of distances between 
-    each point and its nearest neighbor is minimized. 
+    choose $k$ centers from them such that the maximal distance between 
+    each point and its nearest center is minimized. 
 \end{frame}
 
 \begin{frame}{K-Center Problem - Formal Definition}
     $d(p, q)$: distance between $p, q$ \\ 
     $d(p, S) := \min_{q \in S} d(p, q)$ \\
     \textbf{Input:} $S, k$ \\
-    \textbf{Output:} $C \subseteq S$ s.t. $|C| = k$ and  $\sum_{p \in S} d(p, S)$ 
+    \textbf{Output:} $C \subseteq S$ s.t. $|C| = k$ and  $r = \max_{p \in S} d(p, C)$ 
     is minimized \\[20pt]
     \pause 
-    \textbf{What is the distance function? \\ Or what property does the distance function have?}
+    \textbf{We don't require constraints on distance, as we need to do to TSP}
 \end{frame}
 
 % present an example (from book?)
@@ -307,25 +266,12 @@ The lateness of all jobs is
 \begin{frame}{Algorithm - Description}
     Find $v \in S \backslash C$ s.t. $d(v, C)$ is maximized. \brk
     $C' = C \cup \{v\}$ \brk
-    \pause
-    What is the cost per iteration? \pause $O(|S| \cdot |S \backslash V|) = O(n^2)$
 \end{frame}
 
 \begin{frame}{Algorithm - Description}
     But, what is $C$ at the beginning of the iteration? 
-    \pause 
-    \begin{enumerate}
-        \item The center of all points? $\implies$ Needs another $O(n^2)$ cost 
-        \item Any arbitrary point $\implies$ Constant cost
-    \end{enumerate}
-    \pause
-    Is the $O(n^2)$ cost worth it? We will discuss it later.
-\end{frame}
-
-\begin{frame}{Analysis}
-    \textbf{Quadratic} cost
-    \pause\brk
-    \textbf{Approximation ratio?}
+    \pause \brk
+    Any arbitrary point would do!
 \end{frame}
 
 \begin{frame}{Approximation ratio: Base}
@@ -335,14 +281,13 @@ The lateness of all jobs is
     \begin{align*}
         r \leq 2r^*        
     \end{align*}
-    If they are not covered $\implies$ a shorter radius is ok. \brk
     \pause 
-    But guarantees $\alpha = \dfrac{r}{r^*} = 2$ 
+    Guarantees $\alpha = \dfrac{r}{r^*} = 2$ 
 \end{frame}
 
 \begin{frame}{Approximation ratio: General}
     What if one optimal cluster contains two or even more centers? \brk 
-    This is solve by our greediness. \textbf{HOW?}
+    This is solved by our greediness. \textbf{HOW?}
 \end{frame}
 
 \begin{frame}{Approximation ratio: Improvement?}
@@ -350,16 +295,41 @@ The lateness of all jobs is
     Sadly, NO
 \end{frame}
 
+
+\begin{frame}{Dominating Set}
+    If there is $\alpha < 2 \implies$ Dominating Set is solvable in polytime. \brk 
+    \textbf{Input:} Graph $G = (V, E)$ \brk
+    \textbf{Output:} $D \subseteq V$ and integer $k$ s.t. $|D| = k$ and each vertice is $V$ is either in $D$ or is adjacent to a vertice in $D$
+\end{frame}
+
+\begin{frame}{Dominating Set - Reduction}
+    We reduce the instance of dominating set to k-center. 
+    \begin{itemize}
+        \item For each vertice $u, v \in V$ 
+        \begin{enumerate}
+            \item If $u, v$ are adjacent: $d(u, v) = 2$
+            \item If not: $d(u, v) = 1$
+        \end{enumerate}
+        \item If there is $|D| = k$: each cluster in $k$-center has radius $r^* = 1$
+        \item If $|D| > k$: there exists cluster with $r^* = 2$
+        \item If we can approximate $k-$center with $\alpha < 2$
+        \begin{align*}
+            r \leq \alpha r^* = \alpha < 2
+        \end{align*}
+        This solves dominating set directly.
+    \end{itemize}
+\end{frame}
+
 % omit the reduction of dominating set due to time limitations
 % But keep this part for TSP
 
-\begin{frame}{Traverlling Salesman Problem(TSP)}
+\begin{frame}{Travelling Salesman Problem(TSP)}
     \textbf{Problem Statement:} Given a complete weighted graph of $n$ vertices, find the round tour with the minimal cost. 
 \end{frame}
 
 \begin{frame}{TSP - Formal Definition}
     \textbf{Input:} $G = (V, d)$ \\
-    \textbf{Output:} Path $\pi$ s.t. $\sum_{i = 1}^{n-1} w(\pi(1), \pi(2))$
+    \textbf{Output:} Path $\pi$ s.t. $\sum_{i = 1}^{n-1} w(\pi(i), \pi(i+1))$
     is minimized \\[20pt]
     \pause 
     \textbf{What is the distance function? \\ Or what property does the distance function have?}
@@ -400,7 +370,7 @@ The lateness of all jobs is
 
 \begin{frame}{Algorithm - A bit help from Christofide}
 \begin{itemize}
-    \item<1-> We can do the same trick to all Eulerian Graphs
+    \item<1-> We can do the same trick to all Eulerian graphs
     \item<2-> As long as it connects all vertices 
     \item<3-> How to make MST Eulerian?
     \item<4-> Make all vertices have \textbf{even} degrees
@@ -412,9 +382,19 @@ The lateness of all jobs is
     \begin{enumerate}
         \item<1-> Connect all vertices with odd degrees
         \item<2-> How many vertices with odd degrees?
-        \item<3-> Finding a perfect matching
-        \item<4-> What is the cost? What is the size of the PM?
     \end{enumerate}
+\end{frame}
+
+\begin{frame}{Algorithm - A bit help from Christofide}
+    Matching: a set of edges that don't share vertices. \brk 
+    Perfect Matching: a matching covering all vertices \brk 
+    \pause 
+    \begin{itemize}
+        \item Remove all vertices with even degrees and their edges in $G$
+        \item Find a PM in the result graph $O$
+        \item Combine O with the MST
+        \item Do the trick on Eulerian graph!
+    \end{itemize}
 \end{frame}
 
 \begin{frame}{Algorithm - A bit help from Christofide}
