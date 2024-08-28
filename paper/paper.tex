@@ -54,40 +54,41 @@
 \maketitle
 \section{Introduction}
 The theory of computer science has grown significantly throughout the past century. Among many topics, \NP-hardness has drawn the attention of many researchers. 
-While there is no proof whether $\PTIME=\NP$, people tend to be interested in compensation: solving NP-hard problems with a sub-optimal solution in polynomial time, which is the motivation of approximation algorithms. This paper introduces two fundamental techniques in designing approximation algorithms: greedy algorithm and local search.
-We start with some mathematical backgrounds, followed by a brief introduction of greedy and local search. 
-Then, we present a few examples that exploit these techniques.
+While there is no proof whether $\PTIME=\NP$, people tend to be interested in alternatives: solving NP-hard problems with a sub-optimal solution in polynomial time, 
+the approximation algorithms. This paper introduces two fundamental techniques in designing approximation algorithms: greedy algorithm and local search algorithms.
+We start with some mathematical backgrounds, followed by a brief introduction of two techniques. 
+Finally, we present a few examples that exploit these techniques.
 
 \section{Mathematical Backgrounds}
 \subsection{Approximation Ratio}
 Approximation algorithms attempt to solve optimization problems with a sub-optimal solution in polynomial time. 
 Hence, in this context, we refer to an \NP-hard problem as an \NP-hard optimization problem instead of a decision problem. 
-With the goal problems clarified, we introduce the concept of approximation ratio.
+To evaluate the quality of approximation, we introduce approximation ratio.
 \begin{definition}[Approximation Ratio]
-    Given an optimization problem, its optimal solution $Opt^*$, and a sub-optimal solution $Opt$ given by algorithm $A$, suppose the size of solutions 
-    are measured by $|\cdot|$. The approximation ratio $\alpha$ of algorithm $A$ is defined as 
+    Let $Opt^*$ be the optimal solution of an optimization problem, and let $Opt$ be its solution given by algorithm $A$. 
+    Suppose the size of solutions is measured by $|\cdot|$. The approximation ratio $\alpha$ of algorithm $A$ is defined as 
     \begin{align*}
         \alpha = \frac{|Opt|}{|Opt^*|}
     \end{align*}
 \end{definition}
 The approximation ratio $\alpha$ shows how close the solution $Opt$ is to the optimal solution $Opt^*$. For an maximization problem, $\alpha < 1$, while $\alpha > 1$
-for a minimization problem. The better the approximation, the closer $\alpha$ is to 1.
+for a minimization problem.
 
 \subsection{Greedy Algorithms and Local Search}
-Both greedy algorithms and local search construct the solution step by step. 
+Both greedy and local search algorithms construct the solution step by step. 
 In each step, the strategy makes certain decisions to optimize the result locally. 
-The difference between the two techniques lies in the strategy of making decisions. 
-The greedy algorithms try to make the best decision at each step, and the solution is not guaranteed to 
-be \textit{feasible} at the beginning. On the other hand, local search starts with an arbitrary feasible solution
+Their difference is where the algorithm starts. 
+The greedy algorithm usually starts with an empty solution, which may not be feasible. 
+On the other hand, local search starts with an arbitrary feasible solution
 and maintains the feasibility while improving the solution. 
 Hence, greedy algorithms are called \textit{primal infeasible} algorithms, while local search algorithms 
 are referred to as \textit{primal feasible} algorithms.
 
 
 \section{Scheduling on A Single Machine}
-Scheduling, or Job Sequencing, is one of the earliest discovered NP-complete problems. 
-It was amongst the first 21 NP-complete problems published by Karp in 1972. In this section, 
-we examine a simplified version of the problem: only one machine is available for scheduling.
+Scheduling, or Job Sequencing, is one of the earliest discovered \textbf{NP}-complete problems. 
+It was amongst the first 21 \textbf{NP}-complete problems published by Karp in 1972. In this section, 
+we examine a simplified version of the problem: only one machine is available for processing.
 \begin{definition}[Scheduling on Single Machine]
     Given $n$ jobs to be processed with processing time $p_j$, release time $r_j \geq 0$, and deadline $d_j$ with $j = 1, \cdots, n$.
     Suppose $j$-th job is completed at time $C_j$. We define the lateness as $L_j = C_j - d_j$. The goal is to minimize the maximal lateness 
@@ -96,17 +97,17 @@ we examine a simplified version of the problem: only one machine is available fo
     \end{align*}
 \end{definition} 
 Unfortunately, the problem is \NP-hard, and it remains \NP-hard even if we apply 
-a few constraints to it. \textbf{cite the source} One exceptional case is when all deadlines are non-negative: the lateness is always positive. 
-We are able to give a 2-approximation algorithm for this case. The algorithm simply exploits the earliest due date rule(\textbf{EDD}). 
-Just as the name suggests, whenever the machine finishes a job, it picks the job with the earliest due date from all \textbf{available} jobs.
+a few constraints to it. One exceptional case is when all deadlines are non-negative: the lateness is always positive. 
+We are able to give a 2-approximation algorithm for this case. The algorithm simply exploits the earliest due date rule know as the \textbf{EDD} rule. 
+Just as the name suggests, whenever the machines is idle, it picks the job with the earliest due date from all \textit{available} jobs.
 Here, a job is \textit{available} at time $t$ if $r_j \leq t$.
 
-To analyze the algorithm, we have to introduce a few notations. Let $S$ denote a set of jobs, $r(S) = \min_{j \in S} r_j$, $p(S) = \sum_{j \in S} p_j$, 
+To analyze the algorithm, we have to introduce a few notations. Let $S$ denote a subset of all jobs, $r(S) = \min_{j \in S} r_j$, $p(S) = \sum_{j \in S} p_j$, 
 and $d(S) = \max_{j \in S} d_j$. While $L_{max}$ denotes the maximal lateness computed by the algorithm, $L_{max}^*$ denotes the optimal solution. 
-As preparation, an interesting lower bound on the optimal solution is observed. 
+An interesting lower bound on the optimal solution can be observed. 
 \begin{lemma}
     \label{lemma:lowerbound}
-    For any set of jobs $S$, $L_{max}^* \geq r(S) + p(S) - d(S)$
+    For any subset of jobs $S$, $L_{max}^* \geq r(S) + p(S) - d(S)$
 \end{lemma}
 \begin{proof}
     Suppose job $j$ is the last finished job in the optimal schedule. The scheduling cannot start until $r(S)$. In an optimal schedule, there is no gap between the processing of jobs, and all jobs 
